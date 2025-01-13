@@ -190,7 +190,7 @@ namespace dev.kesera2.physbone_extractor
         private void CopyVRCPhysBone(VRCPhysBone source, VRCPhysBone destination)
         {
             // Vesrion
-            if (!isKeepPBVersion) destination.version = source.version;
+            if (isKeepPBVersion) destination.version = source.version;
             
             // Copy properties from source to destination
             destination.name = source.name;
