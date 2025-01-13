@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -19,8 +20,13 @@ namespace dev.kesera2.physbone_extractor
         [MenuItem("Tools/kesera2/PhysBone Extractor")]
         public static void ShowWindow()
         {
-            Localization.LoadLocalization(Localization.SupportedLanguages[_selectedLanguage]);
+            Localization.LoadLocalization(_selectedLanguage);
             GetWindow<PhysBoneExtractor>("PhysBone Extractor");
+        }
+
+        private void OnEnable()
+        {
+            Localization.LoadLocalization(_selectedLanguage);
         }
 
         private void ShowSelectLanguage()

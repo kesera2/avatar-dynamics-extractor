@@ -28,6 +28,11 @@ namespace dev.kesera2.physbone_extractor
             return SupportedLanguageDisplayNames.TryGetValue(l, out var displayName) ? displayName : l;
         }).ToArray();
         
+        public static void LoadLocalization(int index)
+        {
+            LoadLocalization(SupportedLanguages[index]);
+        }
+        
         public static void LoadLocalization(string language)
         {
             Debug.Log("language: " + language);
