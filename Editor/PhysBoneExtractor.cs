@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Dynamics.PhysBone.Components;
@@ -9,20 +10,23 @@ namespace dev.kesera2.physbone_extractor
     {
         [SerializeField] private GameObject prefabRoot; // 元のGameObject
         [SerializeField] private GameObject searchRoot; // 探索するGameObject
-        [SerializeField] private bool isDeleteEnabled = true;
-        private string[] languageOptions = { "ja-jp", "en-us" };
-        private int _selectedLanguage = 0;
+        [SerializeField] private bool isDeleteEnabled = false;
+        private static string[] languageOptions = { "ja-jp", "en-us" };
+        private static int _selectedLanguage = 0;
         private GameObject _avatarDynamics;
+        private Transform _avatarArmature;
+        private bool isSearchRootSet;
 
         [MenuItem("Tools/kesera2/PhysBone Extractor")]
         public static void ShowWindow()
         {
+            Localization.LoadLocalization(languageOptions[_selectedLanguage]);
             GetWindow<PhysBoneExtractor>("PhysBone Extractor");
         }
         
         private void ShowSelectLanguage()
         {
-            var selectedLanguage = EditorGUILayout.Popup("Select Language", _selectedLanguage, languageOptions);
+            var selectedLanguage = EditorGUILayout.Popup("Language", _selectedLanguage, languageOptions);
             if (_selectedLanguage != selectedLanguage) Localization.LoadLocalization(languageOptions[selectedLanguage]);
             _selectedLanguage = selectedLanguage;
         }
@@ -31,15 +35,30 @@ namespace dev.kesera2.physbone_extractor
         {
             // 言語選択ポップアップ
             ShowSelectLanguage();
-            EditorGUILayout.LabelField(Localization.GetTranslation("test"));   
-            GUILayout.Label("Select GameObject", EditorStyles.boldLabel);
             prefabRoot =
-                (GameObject)EditorGUILayout.ObjectField("Prefab Root GameObject", prefabRoot, typeof(GameObject), true);
-            searchRoot =
-                (GameObject)EditorGUILayout.ObjectField("Search Root GameObject", searchRoot, typeof(GameObject), true);
-            isDeleteEnabled = EditorGUILayout.Toggle("オリジナルのコンポーネントを削除する", isDeleteEnabled);
-            if (GUILayout.Button("Copy VRC Phys Bones"))
+                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.prefab.root"), prefabRoot, typeof(GameObject), true);
+            if (prefabRoot == null)
             {
+                EditorGUILayout.HelpBox(Localization.S("warn.assign.prefab"), MessageType.Warning);
+                isSearchRootSet = false;
+                return;
+            }
+
+            _avatarArmature = GetArmatureTransform();
+            if (_avatarArmature && !isSearchRootSet)
+            {
+                searchRoot = _avatarArmature.gameObject;
+                isSearchRootSet = true;
+            }
+            searchRoot =
+                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.search.root"), searchRoot, typeof(GameObject), true);
+            isDeleteEnabled = EditorGUILayout.Toggle(Localization.S("option.remove.original"), isDeleteEnabled);
+            if (GUILayout.Button(Localization.S("button.extract")))
+            {
+                if (!DisplayConfirmDialog())
+                {
+                    return;
+                }
                 if (prefabRoot != null && searchRoot != null)
                 {
                     CreateAvatarDynamics();
@@ -180,6 +199,23 @@ namespace dev.kesera2.physbone_extractor
             destination.isGlobalCollider = source.isGlobalCollider;
             destination.playerId = source.playerId;
             destination.shape = source.shape;
+        }
+        
+        private Transform GetArmatureTransform()
+        {
+            return prefabRoot.GetComponentsInChildren<Transform>()
+                .FirstOrDefault(t => t.name.ToLower() == "armature");
+        }
+
+        private bool DisplayConfirmDialog()
+        {
+            // メッセージボックスを表示
+            return EditorUtility.DisplayDialog(
+                Localization.S("msg.dialog.title"), // ダイアログのタイトル
+                Localization.S("msg.dialog.message"), // メッセージ
+                "OK",
+                "Cancel"
+            );
         }
     }
 }
