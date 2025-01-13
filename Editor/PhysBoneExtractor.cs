@@ -10,9 +10,10 @@ namespace dev.kesera2.physbone_extractor
 {
     public class PhysBoneExtractor : EditorWindow
     {
-        [SerializeField] private GameObject prefabRoot; // 元のGameObject
-        [SerializeField] private GameObject searchRoot; // 探索するGameObject
-        [SerializeField] private bool isDeleteEnabled = false;
+        private GameObject prefabRoot; // 元のGameObject
+        private GameObject searchRoot; // 探索するGameObject
+        private bool isKeepPBVersion = false;
+        private bool isDeleteEnabled = true;
         private static int _selectedLanguage = 0;
         private GameObject _avatarDynamics;
         private Transform _avatarArmature;
@@ -72,6 +73,12 @@ namespace dev.kesera2.physbone_extractor
             {
                 GUILayout.Label(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
                 isDeleteEnabled = EditorGUILayout.Toggle(isDeleteEnabled);
+            }
+
+            using (new GUILayout.HorizontalScope())
+            {
+                GUILayout.Label(Localization.S("option.keep.pb.version"), Settings.LabelGuiLayoutOptions);
+                isKeepPBVersion = EditorGUILayout.Toggle(isKeepPBVersion);
             }
 
             using (new EditorGUI.DisabledScope(!CanExecute()))
@@ -183,7 +190,7 @@ namespace dev.kesera2.physbone_extractor
         private void CopyVRCPhysBone(VRCPhysBone source, VRCPhysBone destination)
         {
             // Vesrion
-            destination.version = source.version;
+            if (!isKeepPBVersion) destination.version = source.version;
             
             // Copy properties from source to destination
             destination.name = source.name;
@@ -335,7 +342,7 @@ namespace dev.kesera2.physbone_extractor
 
         private bool DisplayConfirmDialog()
         {
-            var message = Localization.S("msg.dialog.message");
+            var message = Localization.S("msg.dialog.message") + "\n";
             if (isDeleteEnabled)
             {
                 message += "\n" + Localization.S("msg.dialog.remove.original");
@@ -343,6 +350,15 @@ namespace dev.kesera2.physbone_extractor
             else
             {
                 message += "\n" + Localization.S("msg.dialog.keep.original");
+            }
+
+            if (isKeepPBVersion)
+            {
+                message += "\n" + Localization.S("msg.dialog.keep.pb.version");
+            }
+            else
+            {
+                message += "\n" + Localization.S("msg.dialog.update.pb.version");
             }
 
             // メッセージボックスを表示
