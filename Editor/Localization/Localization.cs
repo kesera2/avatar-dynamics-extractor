@@ -39,11 +39,6 @@ namespace dev.kesera2.physbone_extractor
             return key; // デフォルトとしてキーを返す
         }
         
-        public static void SetLanguage(string language)
-        {
-            LoadLocalization(language);
-        }
-        
         private static string GetFilePath(string language)
         {
             return $"{LocalizationPathRoot}/{language}.json";

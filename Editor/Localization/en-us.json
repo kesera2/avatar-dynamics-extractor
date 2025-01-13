@@ -2,6 +2,7 @@
   "test": "test",
   "label.prefab.root" : "avatar root GameObject",
   "label.search.root" : "search root GameObject",
+  "warn.assign.avatar.root": "Please assign the avatar root",
   "warn.assign.prefab": "Please assign the avatar root",
   "button.extract": "Extract Physbone and PhysboneCollider",
   "option.remove.original": "Remove original components",

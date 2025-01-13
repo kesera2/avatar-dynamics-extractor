@@ -43,6 +43,11 @@ namespace dev.kesera2.physbone_extractor
                 isSearchRootSet = false;
                 return;
             }
+            if (Utility.hasParentGameObject(prefabRoot))
+            {
+                EditorGUILayout.HelpBox(Localization.S("warn.assign.avatar.root"), MessageType.Warning);
+                return;
+            }
 
             _avatarArmature = GetArmatureTransform();
             if (_avatarArmature && !isSearchRootSet)

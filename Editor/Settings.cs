@@ -2,6 +2,6 @@
 {
     public static class Settings
     {
-        public static string ToolName => "Phys Bone Extractor";
+        public static string ToolName => "PhysBone Extractor";
     }
 }

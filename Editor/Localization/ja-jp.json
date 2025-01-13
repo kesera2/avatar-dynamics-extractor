@@ -3,6 +3,7 @@
   "label.prefab.root" : "アバタールートのGameObject",
   "label.search.root" : "検索先GameObject",
   "option.remove.original": "元のコンポーネントを削除",
+  "warn.assign.avatar.root": "アバタールートを割り当ててください",
   "warn.assign.prefab": "シーンのアバタールートのPrefabを割り当ててください",
   "button.extract": "PhysboneとPhysboneColliderを抽出",
   "msg.dialog.title": "PhysBone Extractor",
