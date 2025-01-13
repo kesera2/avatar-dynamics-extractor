@@ -1,7 +1,37 @@
-﻿namespace dev.kesera2.physbone_extractor
+﻿using UnityEditor;
+using UnityEngine;
+
+namespace dev.kesera2.physbone_extractor
 {
     public static class Settings
     {
-        public static string ToolName => "PhysBone Extractor";
+        public static readonly string ToolName = "PhysBone Extractor";
+        public static readonly string WindowTitle = "Physbone Extractor";
+        public static readonly string AvatarDynamicsGameObjectName = "AvatarDynamics";
+        public static readonly string PhysboneGameObjectName = "PB";
+        public static readonly string PhysboneColliderGameObjectName = "PBCollider";
+        private static readonly string ImagesFolderGuid = "02ea7ce10f74d444080eff72897e0c7e";
+        public static readonly string ImagesPathRoot = AssetDatabase.GUIDToAssetPath(ImagesFolderGuid);
+        public static readonly string logoFileName = "pb-extractor-logo.png";
+        public static readonly Vector2 windowMinSize = new Vector2(400, 300);
+        public static GUILayoutOption[] LanguagGuiLayoutOptions
+        {
+            get { return new []
+            {
+                GUILayout.Width(100)
+            } ; }
+        }
+        public static GUILayoutOption[] LabelGuiLayoutOptions
+        {
+            get { return new []
+            {
+                GUILayout.Width(200)
+            } ; }
+        }
+        
+        public static string GetLogoPath()
+        {
+            return $"{ImagesPathRoot}/{logoFileName}";
+        }
     }
 }

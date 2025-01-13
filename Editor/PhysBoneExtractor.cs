@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -20,8 +21,8 @@ namespace dev.kesera2.physbone_extractor
         [MenuItem("Tools/kesera2/PhysBone Extractor")]
         public static void ShowWindow()
         {
-            Localization.LoadLocalization(_selectedLanguage);
-            GetWindow<PhysBoneExtractor>("PhysBone Extractor");
+            var window = GetWindow<PhysBoneExtractor>(Settings.WindowTitle);
+            window.minSize = Settings.windowMinSize;
         }
 
         private void OnEnable()
@@ -29,30 +30,27 @@ namespace dev.kesera2.physbone_extractor
             Localization.LoadLocalization(_selectedLanguage);
         }
 
-        private void ShowSelectLanguage()
+        private void DrawSelectLanguage()
         {
-            var selectedLanguage = EditorGUILayout.Popup("Language", _selectedLanguage, Localization.DisplayNames);
-            if (_selectedLanguage != selectedLanguage) Localization.LoadLocalization(Localization.SupportedLanguages[selectedLanguage]);
-            _selectedLanguage = selectedLanguage;
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+                var selectedLanguage =
+                    EditorGUILayout.Popup(_selectedLanguage, Localization.DisplayNames,
+                        Settings.LanguagGuiLayoutOptions);
+                if (_selectedLanguage != selectedLanguage)
+                    Localization.LoadLocalization(Localization.SupportedLanguages[selectedLanguage]);
+                _selectedLanguage = selectedLanguage;
+            }
         }
 
         private void OnGUI()
         {
-            // 言語選択ポップアップ
-            ShowSelectLanguage();
-            prefabRoot =
-                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.prefab.root"), prefabRoot,
-                    typeof(GameObject), true);
-            if (prefabRoot == null)
+            DrawSelectLanguage();
+            DrawLogo();
+            DrawAvatarRootField();
+            if (!ValidatePrefabRoot())
             {
-                EditorGUILayout.HelpBox(Localization.S("warn.assign.prefab"), MessageType.Warning);
-                isSearchRootSet = false;
-                return;
-            }
-
-            if (Utility.hasParentGameObject(prefabRoot))
-            {
-                EditorGUILayout.HelpBox(Localization.S("warn.assign.avatar.root"), MessageType.Warning);
                 return;
             }
 
@@ -63,11 +61,19 @@ namespace dev.kesera2.physbone_extractor
                 isSearchRootSet = true;
             }
 
-            searchRoot =
-                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.search.root"), searchRoot,
-                    typeof(GameObject), true);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
+                searchRoot =
+                    (GameObject)EditorGUILayout.ObjectField(searchRoot, typeof(GameObject), true);
+            }
 
-            isDeleteEnabled = EditorGUILayout.Toggle(Localization.S("option.remove.original"), isDeleteEnabled);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
+                isDeleteEnabled = EditorGUILayout.Toggle(isDeleteEnabled);
+            }
+
             using (new EditorGUI.DisabledScope(!CanExecute()))
             {
                 if (GUILayout.Button(Localization.S("button.extract")))
@@ -97,6 +103,16 @@ namespace dev.kesera2.physbone_extractor
             DisplayWarnSearchRoot();
         }
 
+        private void DrawAvatarRootField()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
+                prefabRoot = (GameObject)EditorGUILayout.ObjectField(prefabRoot,
+                    typeof(GameObject), true);
+            }
+        }
+
         private bool CanExecute()
         {
             return searchRoot;
@@ -105,13 +121,13 @@ namespace dev.kesera2.physbone_extractor
         private void CreateAvatarDynamics()
         {
             // Create PB GameObject under the target GameObject
-            _avatarDynamics = new GameObject("AvatarDynamics");
+            _avatarDynamics = new GameObject(Settings.AvatarDynamicsGameObjectName);
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
 
         private bool CopyPhysBones()
         {
-            var pbParent = new GameObject("PB");
+            var pbParent = new GameObject(Settings.PhysboneGameObjectName);
             pbParent.transform.SetParent(_avatarDynamics.transform);
 
             var vrcPhysBones = new List<VRCPhysBone>(searchRoot.GetComponentsInChildren<VRCPhysBone>());
@@ -139,7 +155,7 @@ namespace dev.kesera2.physbone_extractor
 
         private bool CopyPhysBoneColliders()
         {
-            var pbColliderParent = new GameObject("PBCollider");
+            var pbColliderParent = new GameObject(Settings.PhysboneColliderGameObjectName);
             pbColliderParent.transform.SetParent(_avatarDynamics.transform);
             var vrcPhysboneColliders =
                 new List<VRCPhysBoneCollider>(searchRoot.GetComponentsInChildren<VRCPhysBoneCollider>());
@@ -234,6 +250,57 @@ namespace dev.kesera2.physbone_extractor
                 .FirstOrDefault(t => t.name.ToLower() == "armature");
         }
 
+
+        private static void DrawLogo()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (File.Exists(Settings.GetLogoPath()))
+                {
+                    byte[] fileData = File.ReadAllBytes(Settings.GetLogoPath());
+                    Texture2D logo = new Texture2D(2, 2); // サイズは後で自動調整される
+                    logo.LoadImage(fileData); // PNG, JPG 形式の画像をロード
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.LabelField(new GUIContent(logo), GUILayout.Height(100), GUILayout.Width(400));
+                    GUILayout.FlexibleSpace();
+                }
+            }
+        }
+
+        private void DisplayInfo()
+        {
+            if (searchRoot)
+            {
+                EditorGUILayout.HelpBox(Localization.S("info.description"), MessageType.Info);
+            }
+        }
+
+        private bool ValidatePrefabRoot()
+        {
+            if (prefabRoot == null)
+            {
+                EditorGUILayout.HelpBox(Localization.S("warn.assign.prefab"), MessageType.Warning);
+                isSearchRootSet = false;
+                return false;
+            }
+
+            if (Utility.hasParentGameObject(prefabRoot))
+            {
+                EditorGUILayout.HelpBox(Localization.S("warn.assign.avatar.root"), MessageType.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void DisplayWarnSearchRoot()
+        {
+            if (!searchRoot)
+            {
+                EditorGUILayout.HelpBox(Localization.S("warn.need.assign.search.gameobject"), MessageType.Warning);
+            }
+        }
+
         private bool DisplayConfirmDialog()
         {
             var message = Localization.S("msg.dialog.message");
@@ -253,22 +320,6 @@ namespace dev.kesera2.physbone_extractor
                 "OK",
                 "Cancel"
             );
-        }
-
-        private void DisplayInfo()
-        {
-            if (searchRoot)
-            {
-                EditorGUILayout.HelpBox(Localization.S("info.description"), MessageType.Info);
-            }
-        }
-
-        private void DisplayWarnSearchRoot()
-        {
-            if (!searchRoot)
-            {
-                EditorGUILayout.HelpBox(Localization.S("warn.need.assign.search.gameobject"), MessageType.Warning);
-            }
         }
     }
 }
