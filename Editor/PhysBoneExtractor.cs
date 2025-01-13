@@ -182,48 +182,80 @@ namespace dev.kesera2.physbone_extractor
 
         private void CopyVRCPhysBone(VRCPhysBone source, VRCPhysBone destination)
         {
+            // Vesrion
+            destination.version = source.version;
+            
             // Copy properties from source to destination
             destination.name = source.name;
             destination.enabled = source.enabled;
+            
             // Transforms
             destination.rootTransform = source.rootTransform;
             destination.ignoreTransforms = source.ignoreTransforms;
             destination.endpointPosition = source.endpointPosition;
             destination.multiChildType = source.multiChildType;
+            
             // Forces
             destination.integrationType = source.integrationType;
             destination.pull = source.pull;
+            destination.pullCurve = source.pullCurve;
             destination.spring = source.spring;
+            destination.springCurve = source.springCurve;
             destination.stiffness = source.stiffness;
+            destination.stiffnessCurve = source.stiffnessCurve;
             destination.gravity = source.gravity;
             destination.gravityCurve = source.gravityCurve;
+            destination.gravityFalloff = source.gravityFalloff;
+            destination.gravityFalloffCurve = source.gravityFalloffCurve;
+            destination.immobileType = source.immobileType;
+            destination.immobile = source.immobile;
+            destination.immobileCurve = source.immobileCurve;
+            
             // Limits
             destination.limitType = source.limitType;
             destination.maxAngleX = source.maxAngleX;
             destination.maxAngleZ = source.maxAngleZ;
             destination.maxAngleXCurve = source.maxAngleXCurve;
             destination.maxAngleZCurve = source.maxAngleZCurve;
+            destination.staticFreezeAxis = source.staticFreezeAxis;
             destination.limitRotation = source.limitRotation;
             destination.limitOpacity = source.limitOpacity;
             destination.limitRotationXCurve = source.limitRotationXCurve;
             destination.limitRotationYCurve = source.limitRotationYCurve;
             destination.limitRotationZCurve = source.limitRotationZCurve;
+            
             // Colliders
             destination.radius = source.radius;
+            destination.radiusCurve = source.radiusCurve;
             destination.allowCollision = source.allowCollision;
             destination.colliders = source.colliders;
+            destination.collisionFilter = source.collisionFilter;
+            
             // Stretch & Squish
+            destination.maxStretch = source.maxStretch;
+            destination.maxStretchCurve = source.maxStretchCurve;
+            destination.stretchMotion = source.stretchMotion;
+            destination.stretchMotionCurve = source.stretchMotionCurve;
             destination.maxSquish = source.maxSquish;
+            destination.maxSquishCurve = source.maxSquishCurve;
+            
             // Grab & Pose
             destination.allowGrabbing = source.allowGrabbing;
             destination.allowPosing = source.allowPosing;
             destination.grabMovement = source.grabMovement;
             destination.snapToHand = source.snapToHand;
+            // destination.grabFilter = source.grabFilter;
+            // destination.poseFilter = source.poseFilter;
+            
             // Options
             destination.parameter = source.parameter;
             destination.isAnimated = source.isAnimated;
             destination.resetWhenDisabled = source.resetWhenDisabled;
-            destination.immobileType = source.immobileType;
+            
+            // Gizmos
+            destination.showGizmos = source.showGizmos;
+            destination.boneOpacity = source.boneOpacity;
+            destination.limitOpacity = source.limitOpacity;
         }
 
         private void CopyVRCPhysboneCollider(VRCPhysBoneCollider source, VRCPhysBoneCollider destination)
