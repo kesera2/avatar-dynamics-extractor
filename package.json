@@ -1,13 +1,13 @@
 {
-  "name": "dev.kesera2.physbone-extracter",
-  "version": "0.0.1",
-  "displayName": "Physbone Extracter",
-  "description": "Extract the Physbone component in Armature",
+  "name": "dev.kesera2.physbone-extractor",
+  "version": "2.0.2",
+  "displayName": "Physbone Extractor",
+  "description": "Extract Physbone and Physbone Collider and put into the avatar root as Avatar Dynamics",
   "author": {
     "name": "kesera2",
-    "url": "https://github.com/kesera2/physbone-extracter"
+    "url": "https://github.com/kesera2/physbone-extractor"
   },
-  "unity": "2019.4",
-  "unityRelease": "31f1",
+  "unity": "2022.3",
+  "unityRelease": "22f1",
   "license": "zlib"
 }
