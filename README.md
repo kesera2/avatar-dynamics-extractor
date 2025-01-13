@@ -1,0 +1,2 @@
+# Physbone Extarcter(仮)
+VRChat向けUnity拡張Editor。指定したアバターのPhysboneやPhysbone ColliderをAvatar Dynamicsとしてまとめてコピーします
