@@ -23,7 +23,7 @@ namespace dev.kesera2.physbone_extractor
             Localization.LoadLocalization(languageOptions[_selectedLanguage]);
             GetWindow<PhysBoneExtractor>("PhysBone Extractor");
         }
-        
+
         private void ShowSelectLanguage()
         {
             var selectedLanguage = EditorGUILayout.Popup("Language", _selectedLanguage, languageOptions);
@@ -36,13 +36,15 @@ namespace dev.kesera2.physbone_extractor
             // 言語選択ポップアップ
             ShowSelectLanguage();
             prefabRoot =
-                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.prefab.root"), prefabRoot, typeof(GameObject), true);
+                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.prefab.root"), prefabRoot,
+                    typeof(GameObject), true);
             if (prefabRoot == null)
             {
                 EditorGUILayout.HelpBox(Localization.S("warn.assign.prefab"), MessageType.Warning);
                 isSearchRootSet = false;
                 return;
             }
+
             if (Utility.hasParentGameObject(prefabRoot))
             {
                 EditorGUILayout.HelpBox(Localization.S("warn.assign.avatar.root"), MessageType.Warning);
@@ -55,29 +57,44 @@ namespace dev.kesera2.physbone_extractor
                 searchRoot = _avatarArmature.gameObject;
                 isSearchRootSet = true;
             }
+
             searchRoot =
-                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.search.root"), searchRoot, typeof(GameObject), true);
+                (GameObject)EditorGUILayout.ObjectField(Localization.S("label.search.root"), searchRoot,
+                    typeof(GameObject), true);
+
             isDeleteEnabled = EditorGUILayout.Toggle(Localization.S("option.remove.original"), isDeleteEnabled);
-            if (GUILayout.Button(Localization.S("button.extract")))
+            using (new EditorGUI.DisabledScope(!CanExecute()))
             {
-                if (!DisplayConfirmDialog())
+                if (GUILayout.Button(Localization.S("button.extract")))
                 {
-                    return;
-                }
-                if (prefabRoot != null && searchRoot != null)
-                {
-                    CreateAvatarDynamics();
-                    var hasPhysbone = CopyPhysBones();
-                    var hasPhysboneCollider = CopyPhysBoneColliders();
-                    if (!(hasPhysbone || hasPhysboneCollider))
-                        // Destroy the GameObject of AvatarDynamics if there is no target components.
-                        DestroyImmediate(_avatarDynamics);
-                }
-                else
-                {
-                    Debug.LogWarning("Please assign both Target and Search Root GameObjects.");
+                    if (!DisplayConfirmDialog())
+                    {
+                        return;
+                    }
+
+                    if (prefabRoot != null && searchRoot != null)
+                    {
+                        CreateAvatarDynamics();
+                        var hasPhysbone = CopyPhysBones();
+                        var hasPhysboneCollider = CopyPhysBoneColliders();
+                        if (!(hasPhysbone || hasPhysboneCollider))
+                            // Destroy the GameObject of AvatarDynamics if there is no target components.
+                            DestroyImmediate(_avatarDynamics);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Please assign both Target and Search Root GameObjects.");
+                    }
                 }
             }
+
+            DisplayInfo();
+            DisplayWarnSearchRoot();
+        }
+
+        private bool CanExecute()
+        {
+            return searchRoot;
         }
 
         private void CreateAvatarDynamics()
@@ -205,7 +222,7 @@ namespace dev.kesera2.physbone_extractor
             destination.playerId = source.playerId;
             destination.shape = source.shape;
         }
-        
+
         private Transform GetArmatureTransform()
         {
             return prefabRoot.GetComponentsInChildren<Transform>()
@@ -214,13 +231,39 @@ namespace dev.kesera2.physbone_extractor
 
         private bool DisplayConfirmDialog()
         {
+            var message = Localization.S("msg.dialog.message");
+            if (isDeleteEnabled)
+            {
+                message += "\n" + Localization.S("msg.dialog.remove.original");
+            }
+            else
+            {
+                message += "\n" + Localization.S("msg.dialog.keep.original");
+            }
+
             // メッセージボックスを表示
             return EditorUtility.DisplayDialog(
                 Localization.S("msg.dialog.title"), // ダイアログのタイトル
-                Localization.S("msg.dialog.message"), // メッセージ
+                message, // メッセージ
                 "OK",
                 "Cancel"
             );
+        }
+
+        private void DisplayInfo()
+        {
+            if (searchRoot)
+            {
+                EditorGUILayout.HelpBox(Localization.S("info.description"), MessageType.Info);
+            }
+        }
+
+        private void DisplayWarnSearchRoot()
+        {
+            if (!searchRoot)
+            {
+                EditorGUILayout.HelpBox(Localization.S("warn.need.assign.search.gameobject"), MessageType.Warning);
+            }
         }
     }
 }

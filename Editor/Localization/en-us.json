@@ -1,11 +1,15 @@
 ﻿{
   "test": "test",
+  "info.description": "Extract PhysBone and PhysBoneCollider from the avatar root GameObject.\nYou can specify the child objects under Armature as the search destination GameObject.",
   "label.prefab.root" : "avatar root GameObject",
   "label.search.root" : "search root GameObject",
   "warn.assign.avatar.root": "Please assign the avatar root",
   "warn.assign.prefab": "Please assign the avatar root",
+  "warn.need.assign.search.gameobject" : "Please assign the search root",
   "button.extract": "Extract Physbone and PhysboneCollider",
   "option.remove.original": "Remove original components",
   "msg.dialog.title": "PhysBone Extractor",
-  "msg.dialog.message": "Are you sure？"
+  "msg.dialog.message": "Are you sure？",
+  "msg.dialog.keep.original": "Original components will be kept.",
+  "msg.dialog.remove.original": "Original components will be removed."
 }

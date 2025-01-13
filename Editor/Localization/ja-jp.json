@@ -1,11 +1,15 @@
 ﻿{
   "test": "テスト",
+  "info.description": "アバタールートのGameObjectからPhysBoneとPhysBoneColliderを抽出します。\n検索先のGameObjectにはArmature以下の子オブジェクトを指定できます。",
   "label.prefab.root" : "アバタールートのGameObject",
-  "label.search.root" : "検索先GameObject",
+  "label.search.root" : "検索先のGameObject",
   "option.remove.original": "元のコンポーネントを削除",
   "warn.assign.avatar.root": "アバタールートを割り当ててください",
   "warn.assign.prefab": "シーンのアバタールートのPrefabを割り当ててください",
+  "warn.need.assign.search.gameobject" : "検索先のGameObjectを割り当ててください",
   "button.extract": "PhysboneとPhysboneColliderを抽出",
   "msg.dialog.title": "PhysBone Extractor",
-  "msg.dialog.message": "実行してもよろしいですか？"
+  "msg.dialog.message": "実行してもよろしいですか？",
+  "msg.dialog.keep.original": "元のコンポーネントは保持されます。",
+  "msg.dialog.remove.original": "オリジナルのコンポーネントは削除されます。"
 }
