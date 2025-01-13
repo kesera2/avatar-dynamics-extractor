@@ -11,7 +11,6 @@ namespace dev.kesera2.physbone_extractor
         [SerializeField] private GameObject prefabRoot; // 元のGameObject
         [SerializeField] private GameObject searchRoot; // 探索するGameObject
         [SerializeField] private bool isDeleteEnabled = false;
-        private static string[] languageOptions = { "ja-jp", "en-us" };
         private static int _selectedLanguage = 0;
         private GameObject _avatarDynamics;
         private Transform _avatarArmature;
@@ -20,14 +19,14 @@ namespace dev.kesera2.physbone_extractor
         [MenuItem("Tools/kesera2/PhysBone Extractor")]
         public static void ShowWindow()
         {
-            Localization.LoadLocalization(languageOptions[_selectedLanguage]);
+            Localization.LoadLocalization(Localization.SupportedLanguages[_selectedLanguage]);
             GetWindow<PhysBoneExtractor>("PhysBone Extractor");
         }
 
         private void ShowSelectLanguage()
         {
-            var selectedLanguage = EditorGUILayout.Popup("Language", _selectedLanguage, languageOptions);
-            if (_selectedLanguage != selectedLanguage) Localization.LoadLocalization(languageOptions[selectedLanguage]);
+            var selectedLanguage = EditorGUILayout.Popup("Language", _selectedLanguage, Localization.DisplayNames);
+            if (_selectedLanguage != selectedLanguage) Localization.LoadLocalization(Localization.SupportedLanguages[selectedLanguage]);
             _selectedLanguage = selectedLanguage;
         }
 
