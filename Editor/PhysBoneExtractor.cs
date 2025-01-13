@@ -144,7 +144,7 @@ namespace dev.kesera2.physbone_extractor
                 CopyVRCPhysBone(sourcePhysBone, newVrcPhysBone);
 
                 // Set the Root Transform
-                if (!newVrcPhysBone.rootTransform) newVrcPhysBone.rootTransform = newPhysBone.transform;
+                if (!newVrcPhysBone.rootTransform) newVrcPhysBone.rootTransform = sourcePhysBone.transform;
 
                 // Remove original VRC Phys Bone component
                 if (isDeleteEnabled) DestroyImmediate(sourcePhysBone);
@@ -171,7 +171,7 @@ namespace dev.kesera2.physbone_extractor
                 CopyVRCPhysboneCollider(sourcePbCollider, destPbCollider);
 
                 // Set the Root Transform
-                if (!destPbCollider.rootTransform) destPbCollider.rootTransform = newCollider.transform;
+                if (!destPbCollider.rootTransform) destPbCollider.rootTransform = sourcePbCollider.transform;
 
                 // Remove original VRC Phys Bone Collider component
                 if (isDeleteEnabled) DestroyImmediate(sourcePbCollider);
