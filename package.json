@@ -1,6 +1,6 @@
 {
   "name": "dev.kesera2.physbone-extractor",
-  "version": "1.0.0-bata1",
+  "version": "0.1.0",
   "displayName": "Physbone Extractor",
   "description": "Extract Physbone and Physbone Collider and put into the avatar root as Avatar Dynamics",
   "author": {
