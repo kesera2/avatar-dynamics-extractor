@@ -35,7 +35,6 @@ namespace dev.kesera2.physbone_extractor
         
         public static void LoadLocalization(string language)
         {
-            Debug.Log("language: " + language);
             string filePath = GetFilePath(language);
 
             if (File.Exists(filePath))

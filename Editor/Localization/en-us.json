@@ -1,5 +1,5 @@
 ﻿{
-  "info.description": "Extract PhysBone and PhysBoneCollider from the avatar root GameObject.\nYou can specify the child objects under Armature as the search destination GameObject.",
+  "info.description": "Extract PhysBone, PhysBoneCollider, VRC Contact Sender/Receiver from the GameObject of the avatar root.\nThe default search target GameObject is the Armature object in the avatar root.",
   "label.prefab.root" : "Avatar root GameObject",
   "label.search.root" : "Search root GameObject",
   "label.name.avatar_dynamics": "Name of AvatarDynamics",
@@ -13,6 +13,7 @@
   "warn.assign.avatar.root": "Please assign the avatar root",
   "warn.assign.prefab": "Please assign the avatar root",
   "warn.need.assign.search.gameobject" : "Please assign the search root",
+  "warn.search.root.not.child": "The search root is not a child of the avatar root",
   "button.extract": "Start Extraction",
   "option.keep.pb.version": "Keep the original PhysBone version",
   "msg.dialog.title": "PhysBone Extractor",
