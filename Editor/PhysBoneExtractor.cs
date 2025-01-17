@@ -69,75 +69,49 @@ namespace dev.kesera2.physbone_extractor
         {
             DrawSelectLanguage();
             DrawLogo();
-            DrawAvatarRootField();
-            if (!ValidatePrefabRoot())
-            {
-                return;
-            }
-            DrawSearchRootField();
-        
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.LabelField("AvatarDynamicsの名前", Settings.LabelGuiLayoutOptions);
-                avatarDynamicsGameObjectName = EditorGUILayout.TextField(avatarDynamicsGameObjectName);
-            }
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField("PhysBoneの名前", Settings.LabelGuiLayoutOptions);
-                pbGameObjectName = EditorGUILayout.TextField(pbGameObjectName);
-            }
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField("PhysBoneColliderの名前", Settings.LabelGuiLayoutOptions);
-                pbColliderGameObjectName = EditorGUILayout.TextField(pbColliderGameObjectName);
-            }
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField("Contactsの名前", Settings.LabelGuiLayoutOptions);
-                contactsGameObjectName = EditorGUILayout.TextField(contactsGameObjectName);
-            }
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField("Contactsを分類分けする", Settings.LabelGuiLayoutOptions);
-                splitContacts = EditorGUILayout.Toggle(splitContacts);
-            }
-
-
-            using (new EditorGUI.DisabledScope(!splitContacts))
-            {
-                using (new EditorGUI.IndentLevelScope())
+                using (new GUILayout.VerticalScope())
                 {
-                    using (new EditorGUILayout.HorizontalScope())
+                    EditorGUILayout.LabelField(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
+                    if (prefabRoot)
                     {
-                        EditorGUILayout.LabelField("ContactSenderの名前", Settings.LabelIndentGuiLayoutOptions);
-                        contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
-                    }
-
-
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUILayout.LabelField("ContactReceiverの名前", Settings.LabelIndentGuiLayoutOptions);
-                        contactReceiverGameObjectName = EditorGUILayout.TextField(contactReceiverGameObjectName);
+                        EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField("AvatarDynamicsの名前", Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField("PhysBoneの名前", Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField("PhysBoneColliderの名前", Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField("Contactsの名前", Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField("Contactsを分類分けする", Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField("ContactSenderの名前", Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField("ContactReceiverの名前", Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"), Settings.LabelGuiLayoutOptions);
                     }
                 }
-            }
 
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
-                isDeleteEnabled = EditorGUILayout.Toggle(isDeleteEnabled);
+                using (new GUILayout.VerticalScope())
+                {
+                    DrawAvatarRootField();
+                    if (prefabRoot)
+                    {
+                        DrawSearchRootField();
+                        avatarDynamicsGameObjectName = EditorGUILayout.TextField(avatarDynamicsGameObjectName);
+                        pbGameObjectName = EditorGUILayout.TextField(pbGameObjectName);
+                        pbColliderGameObjectName = EditorGUILayout.TextField(pbColliderGameObjectName);
+                        contactsGameObjectName = EditorGUILayout.TextField(contactsGameObjectName);
+                        splitContacts = EditorGUILayout.Toggle(splitContacts);
+                        using (new EditorGUI.DisabledScope(!splitContacts))
+                        {
+                            contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
+                            contactReceiverGameObjectName = EditorGUILayout.TextField(contactReceiverGameObjectName);
+                        }
+                        isDeleteEnabled = EditorGUILayout.Toggle(isDeleteEnabled);
+                        isKeepPBVersion = EditorGUILayout.Toggle(isKeepPBVersion);
+                    }
+                }
+                
             }
-
-            using (new GUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"), Settings.LabelGuiLayoutOptions);
-                isKeepPBVersion = EditorGUILayout.Toggle(isKeepPBVersion);
-            }
-
+            if (!ValidatePrefabRoot()) return;
             using (new EditorGUI.DisabledScope(!CanExecute()))
             {
                 if (GUILayout.Button(Localization.S("button.extract")))
@@ -182,7 +156,6 @@ namespace dev.kesera2.physbone_extractor
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.LabelField(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
                 searchRoot =
                     (GameObject)EditorGUILayout.ObjectField(searchRoot, typeof(GameObject), true);
             }
@@ -190,17 +163,14 @@ namespace dev.kesera2.physbone_extractor
 
         private void DrawAvatarRootField()
         {
-            using (new EditorGUILayout.HorizontalScope())
+            var avatarRoot = (GameObject)EditorGUILayout.ObjectField(prefabRoot,
+                typeof(GameObject), true);
+            if (avatarRoot != prefabRoot)
             {
-                EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
-                var avatarRoot = (GameObject)EditorGUILayout.ObjectField(prefabRoot,
-                    typeof(GameObject), true);
-                if (avatarRoot != prefabRoot)
-                {
-                    prefabRootChanged = true;
-                }
-                prefabRoot = avatarRoot;
+                prefabRootChanged = true;
             }
+
+            prefabRoot = avatarRoot;
         }
 
         private bool CanExecute()
@@ -390,12 +360,9 @@ namespace dev.kesera2.physbone_extractor
 
         private Transform GetArmatureTransform()
         {
-            // if (!(prefabRoot && searchRoot))
-            // {
-                // Debug.Log("GetArmatureTransform is called");
-            // }
-                return prefabRoot.GetComponentsInChildren<Transform>()
-                    .FirstOrDefault(t => t.name.ToLower() == "armature");
+            if (prefabRoot == null) return null;
+            return prefabRoot.GetComponentsInChildren<Transform>()
+                .FirstOrDefault(t => t.name.ToLower() == "armature");
         }
 
         private void CopyVRCContactSender(VRCContactSender source, VRCContactSender destination)
