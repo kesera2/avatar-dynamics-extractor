@@ -117,7 +117,7 @@ namespace dev.kesera2.physbone_extractor
                 GUILayout.Label("Contactsを分類分けする", Settings.LabelGuiLayoutOptions);
                 splitContacts = EditorGUILayout.Toggle(splitContacts);
             }
-            
+
 
             using (new EditorGUI.DisabledScope(!splitContacts))
             {
@@ -137,7 +137,7 @@ namespace dev.kesera2.physbone_extractor
                     }
                 }
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
@@ -162,8 +162,10 @@ namespace dev.kesera2.physbone_extractor
                     if (prefabRoot != null && searchRoot != null)
                     {
                         CreateAvatarDynamics();
-                        var hasPhysbone = CopyComponent<VRCPhysBone>(_avatarDynamics, pbGameObjectName, CopyVRCPhysBone);
-                        var hasPhysboneCollider = CopyComponent<VRCPhysBoneCollider>(_avatarDynamics, pbColliderGameObjectName, CopyVRCPhysboneCollider);
+                        var hasPhysbone =
+                            CopyComponent<VRCPhysBone>(_avatarDynamics, pbGameObjectName, CopyVRCPhysBone);
+                        var hasPhysboneCollider = CopyComponent<VRCPhysBoneCollider>(_avatarDynamics,
+                            pbColliderGameObjectName, CopyVRCPhysboneCollider);
                         var hasContacts = CopyVRCContacts();
                         if (!(hasPhysbone || hasPhysboneCollider || hasContacts))
                             // Destroy the GameObject of AvatarDynamics if there is no target components.
@@ -201,8 +203,9 @@ namespace dev.kesera2.physbone_extractor
             _avatarDynamics = new GameObject(avatarDynamicsGameObjectName);
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
-        
-        private bool CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction, bool useParentGameObject = false) where T : Component
+
+        private bool CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction,
+            bool useParentGameObject = false) where T : Component
         {
             GameObject componentsParent;
             if (useParentGameObject)
@@ -233,7 +236,8 @@ namespace dev.kesera2.physbone_extractor
                 {
                     if (!destPhysBone.rootTransform) destPhysBone.rootTransform = sourcePhysBone.transform;
                 }
-                else if (destComponent is VRCPhysBoneCollider destCollider && sourceComponent is VRCPhysBoneCollider sourceCollider)
+                else if (destComponent is VRCPhysBoneCollider destCollider &&
+                         sourceComponent is VRCPhysBoneCollider sourceCollider)
                 {
                     if (!destCollider.rootTransform) destCollider.rootTransform = sourceCollider.transform;
                 }
@@ -241,10 +245,12 @@ namespace dev.kesera2.physbone_extractor
                 // Remove original component
                 if (isDeleteEnabled) DestroyImmediate(sourceComponent);
             }
+
             if (components.Count == 0)
             {
                 DestroyImmediate(componentsParent);
             }
+
             return components.Count > 0;
         }
 
@@ -252,13 +258,16 @@ namespace dev.kesera2.physbone_extractor
         {
             var contactsParent = new GameObject(contactsGameObjectName);
             contactsParent.transform.SetParent(_avatarDynamics.transform);
-            
-            var hasContactSender = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName, CopyVRCContactSender, splitContacts);
-            var hasContactReceiver = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName, CopyVRCContactReceiver, splitContacts);
+
+            var hasContactSender = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName,
+                CopyVRCContactSender, splitContacts);
+            var hasContactReceiver = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName,
+                CopyVRCContactReceiver, splitContacts);
             if (!(hasContactSender && hasContactReceiver))
             {
                 DestroyImmediate(contactsParent);
             }
+
             return hasContactSender && hasContactReceiver;
         }
 
