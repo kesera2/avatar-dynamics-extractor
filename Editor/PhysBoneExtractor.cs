@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using VRC.SDK3.Dynamics.Contact.Components;
 using VRC.SDK3.Dynamics.PhysBone.Components;
 
 namespace dev.kesera2.physbone_extractor
@@ -95,7 +96,8 @@ namespace dev.kesera2.physbone_extractor
                         CreateAvatarDynamics();
                         var hasPhysbone = CopyPhysBones();
                         var hasPhysboneCollider = CopyPhysBoneColliders();
-                        if (!(hasPhysbone || hasPhysboneCollider))
+                        var hasContacts = CopyVRCContacts();
+                        if (!(hasPhysbone || hasPhysboneCollider || hasContacts))
                             // Destroy the GameObject of AvatarDynamics if there is no target components.
                             DestroyImmediate(_avatarDynamics);
                     }
@@ -131,7 +133,7 @@ namespace dev.kesera2.physbone_extractor
             _avatarDynamics = new GameObject(Settings.AvatarDynamicsGameObjectName);
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
-
+        
         private bool CopyPhysBones()
         {
             var pbParent = new GameObject(Settings.PhysboneGameObjectName);
@@ -185,6 +187,61 @@ namespace dev.kesera2.physbone_extractor
             }
 
             return vrcPhysboneColliders.Count > 0;
+        }
+
+        private bool CopyVRCContacts()
+        {
+            return CopyVRCContactSender() && CopyVRCContactReceiver();
+        }
+
+        private bool CopyVRCContactSender()
+        {
+            var contactsParent = new GameObject(Settings.ContactSenderGameObjectName);
+            contactsParent.transform.SetParent(_avatarDynamics.transform);
+            var vrcContactSenders = new List<VRCContactSender>(searchRoot.GetComponentsInChildren<VRCContactSender>());
+            foreach (var sourceContactSender in vrcContactSenders)
+            {
+                var sourceTransform = sourceContactSender.transform;
+                // Create new GameObject and copy component
+                var newContactSender = new GameObject(sourceTransform.name);
+                newContactSender.transform.SetParent(contactsParent.transform);
+
+                // Copy the VRC Contact Sender component
+                var destContactSender = newContactSender.AddComponent<VRCContactSender>();
+                CopyVRCContactSender(sourceContactSender, destContactSender);
+
+                // Set the Root Transform
+                if (!destContactSender.rootTransform) destContactSender.rootTransform = sourceContactSender.transform;
+
+                // Remove original VRC Contact Sender component
+                if (isDeleteEnabled) DestroyImmediate(sourceContactSender);
+            }
+            return vrcContactSenders.Count > 0;
+        }
+
+        private bool CopyVRCContactReceiver()
+        {
+            var contactsParent = new GameObject(Settings.ContactReceiverGameObjectName);
+            contactsParent.transform.SetParent(_avatarDynamics.transform);
+            var vrcContactReceivers = new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
+            foreach (var sourceContactReceiver in vrcContactReceivers)
+            {
+                var sourceTransform = sourceContactReceiver.transform;
+                // Create new GameObject and copy component
+                var newContactReceiver = new GameObject(sourceTransform.name);
+                newContactReceiver.transform.SetParent(contactsParent.transform);
+
+                // Copy the VRC Contact Receiver component
+                var destContactReceiver = newContactReceiver.AddComponent<VRCContactReceiver>();
+                CopyVRCContactReceiver(sourceContactReceiver, destContactReceiver);
+
+                // Set the Root Transform
+                if (!destContactReceiver.rootTransform) destContactReceiver.rootTransform = sourceContactReceiver.transform;
+
+                // Remove original VRC Contact Receiver component
+                if (isDeleteEnabled) DestroyImmediate(sourceContactReceiver);
+            }
+            return vrcContactReceivers.Count > 0;
         }
 
         private void CopyVRCPhysBone(VRCPhysBone source, VRCPhysBone destination)
@@ -287,6 +344,37 @@ namespace dev.kesera2.physbone_extractor
         {
             return prefabRoot.GetComponentsInChildren<Transform>()
                 .FirstOrDefault(t => t.name.ToLower() == "armature");
+        }
+
+        private void CopyVRCContactSender(VRCContactSender source, VRCContactSender destination)
+        {
+            destination.name = source.name;
+            destination.rootTransform = source.rootTransform;
+            destination.shapeType = source.shapeType;
+            destination.radius = source.radius;
+            destination.position = source.position;
+            destination.rotation = source.rotation;
+            destination.collisionTags = source.collisionTags;
+        }
+
+        private void CopyVRCContactReceiver(VRCContactReceiver source, VRCContactReceiver destination)
+        {
+            destination.name = source.name;
+            destination.rootTransform = source.rootTransform;
+            // Shape
+            destination.shapeType = source.shapeType;
+            destination.radius = source.radius;
+            destination.position = source.position;
+            destination.rotation = source.rotation;
+            // Filtering
+            destination.allowSelf = source.allowSelf;
+            destination.allowOthers = source.allowOthers;
+            destination.localOnly = source.localOnly;
+            destination.collisionTags = source.collisionTags;
+            // Receiver
+            destination.receiverType = source.receiverType;
+            destination.parameter = source.parameter;
+            destination.minVelocity = source.minVelocity;
         }
 
 
