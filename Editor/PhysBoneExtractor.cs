@@ -18,6 +18,12 @@ namespace dev.kesera2.physbone_extractor
         private static int _selectedLanguage = 0;
         private GameObject _avatarDynamics;
         private Transform _avatarArmature;
+        private string avatarDynamicsGameObjectName;
+        private string pbGameObjectName;
+        private string pbColliderGameObjectName;
+        private string contactsGameObjectName;
+        private string contactSenderGameObjectName;
+        private string contactReceiverGameObjectName;
         private bool isSearchRootSet;
 
         [MenuItem("Tools/kesera2/PhysBone Extractor")]
@@ -29,7 +35,18 @@ namespace dev.kesera2.physbone_extractor
 
         private void OnEnable()
         {
+            Init();
+        }
+
+        private void Init()
+        {
             Localization.LoadLocalization(_selectedLanguage);
+            avatarDynamicsGameObjectName ??= Settings.AvatarDynamicsGameObjectName;
+            pbGameObjectName ??= Settings.PhysboneGameObjectName;
+            pbColliderGameObjectName ??= Settings.PhysboneColliderGameObjectName;
+            contactsGameObjectName ??= Settings.ContactsGameObjectName;
+            contactSenderGameObjectName ??= Settings.ContactSenderGameObjectName;
+            contactReceiverGameObjectName ??= Settings.ContactReceiverGameObjectName;
         }
 
         private void DrawSelectLanguage()
@@ -68,6 +85,42 @@ namespace dev.kesera2.physbone_extractor
                 GUILayout.Label(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
                 searchRoot =
                     (GameObject)EditorGUILayout.ObjectField(searchRoot, typeof(GameObject), true);
+            }
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("AvatarDynamicsの名前", Settings.LabelGuiLayoutOptions);
+                avatarDynamicsGameObjectName = EditorGUILayout.TextField(avatarDynamicsGameObjectName);
+            }
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("PhysBoneの名前", Settings.LabelGuiLayoutOptions);
+                pbGameObjectName = EditorGUILayout.TextField(pbGameObjectName);
+            }
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("PhysBoneColliderの名前", Settings.LabelGuiLayoutOptions);
+                pbColliderGameObjectName = EditorGUILayout.TextField(pbColliderGameObjectName);
+            }
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("Contactsの名前", Settings.LabelGuiLayoutOptions);
+                contactsGameObjectName = EditorGUILayout.TextField(contactsGameObjectName);
+            }
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("ContactSenderの名前", Settings.LabelGuiLayoutOptions);
+                contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
+            }
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("ContactReceiverの名前", Settings.LabelGuiLayoutOptions);
+                contactReceiverGameObjectName = EditorGUILayout.TextField(contactReceiverGameObjectName);
             }
 
             using (new EditorGUILayout.HorizontalScope())
@@ -130,13 +183,13 @@ namespace dev.kesera2.physbone_extractor
         private void CreateAvatarDynamics()
         {
             // Create PB GameObject under the target GameObject
-            _avatarDynamics = new GameObject(Settings.AvatarDynamicsGameObjectName);
+            _avatarDynamics = new GameObject(avatarDynamicsGameObjectName);
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
         
         private bool CopyPhysBones()
         {
-            var pbParent = new GameObject(Settings.PhysboneGameObjectName);
+            var pbParent = new GameObject(pbGameObjectName);
             pbParent.transform.SetParent(_avatarDynamics.transform);
 
             var vrcPhysBones = new List<VRCPhysBone>(searchRoot.GetComponentsInChildren<VRCPhysBone>());
@@ -164,7 +217,7 @@ namespace dev.kesera2.physbone_extractor
 
         private bool CopyPhysBoneColliders()
         {
-            var pbColliderParent = new GameObject(Settings.PhysboneColliderGameObjectName);
+            var pbColliderParent = new GameObject(pbColliderGameObjectName);
             pbColliderParent.transform.SetParent(_avatarDynamics.transform);
             var vrcPhysboneColliders =
                 new List<VRCPhysBoneCollider>(searchRoot.GetComponentsInChildren<VRCPhysBoneCollider>());
@@ -191,14 +244,14 @@ namespace dev.kesera2.physbone_extractor
 
         private bool CopyVRCContacts()
         {
-            var contactsParent = new GameObject(Settings.ContactsGameObjectName);
+            var contactsParent = new GameObject(contactsGameObjectName);
             contactsParent.transform.SetParent(_avatarDynamics.transform);
             return CopyVRCContactSender(contactsParent) && CopyVRCContactReceiver(contactsParent);
         }
 
         private bool CopyVRCContactSender(GameObject parent)
         {
-            var contactsParent = new GameObject(Settings.ContactSenderGameObjectName);
+            var contactsParent = new GameObject(contactSenderGameObjectName);
             contactsParent.transform.SetParent(parent.transform);
             var vrcContactSenders = new List<VRCContactSender>(searchRoot.GetComponentsInChildren<VRCContactSender>());
             foreach (var sourceContactSender in vrcContactSenders)
@@ -223,7 +276,7 @@ namespace dev.kesera2.physbone_extractor
 
         private bool CopyVRCContactReceiver(GameObject parent)
         {
-            var contactsParent = new GameObject(Settings.ContactReceiverGameObjectName);
+            var contactsParent = new GameObject(contactReceiverGameObjectName);
             contactsParent.transform.SetParent(parent.transform);
             var vrcContactReceivers = new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
             foreach (var sourceContactReceiver in vrcContactReceivers)
