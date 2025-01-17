@@ -77,10 +77,10 @@ namespace dev.kesera2.physbone_extractor
             {
                 using (new GUILayout.VerticalScope())
                 {
-                    EditorGUILayout.LabelField(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
                     if (prefabRoot)
                     {
-                        EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("label.name.avatar_dynamics"), Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("label.name.pb"), Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("label.name.pbc"), Settings.LabelGuiLayoutOptions);
