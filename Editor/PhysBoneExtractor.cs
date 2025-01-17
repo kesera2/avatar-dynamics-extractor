@@ -13,7 +13,7 @@ namespace dev.kesera2.physbone_extractor
     {
         private GameObject prefabRoot; // 元のGameObject
         private GameObject searchRoot; // 探索するGameObject
-        private bool isKeepPBVersion = false;
+        private bool _isKeepPbVersion = false;
         private bool isDeleteEnabled = true;
         private static int _selectedLanguage = 0;
         private GameObject _avatarDynamics;
@@ -84,8 +84,10 @@ namespace dev.kesera2.physbone_extractor
                         EditorGUILayout.LabelField("Contactsを分類分けする", Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField("ContactSenderの名前", Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField("ContactReceiverの名前", Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"), Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("option.remove.original"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"),
+                            Settings.LabelGuiLayoutOptions);
                     }
                 }
 
@@ -105,12 +107,13 @@ namespace dev.kesera2.physbone_extractor
                             contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
                             contactReceiverGameObjectName = EditorGUILayout.TextField(contactReceiverGameObjectName);
                         }
+
                         isDeleteEnabled = EditorGUILayout.Toggle(isDeleteEnabled);
-                        isKeepPBVersion = EditorGUILayout.Toggle(isKeepPBVersion);
+                        _isKeepPbVersion = EditorGUILayout.Toggle(_isKeepPbVersion);
                     }
                 }
-                
             }
+
             if (!ValidatePrefabRoot()) return;
             using (new EditorGUI.DisabledScope(!CanExecute()))
             {
@@ -222,7 +225,8 @@ namespace dev.kesera2.physbone_extractor
                 {
                     if (!destCollider.rootTransform) destCollider.rootTransform = sourceCollider.transform;
                 }
-                else if (destComponent is VRCContactSender destSender && sourceComponent is VRCContactSender sourceSender)
+                else if (destComponent is VRCContactSender destSender &&
+                         sourceComponent is VRCContactSender sourceSender)
                 {
                     if (!destSender.rootTransform) destSender.rootTransform = sourceSender.transform;
                 }
@@ -265,7 +269,7 @@ namespace dev.kesera2.physbone_extractor
         private void CopyVRCPhysBone(VRCPhysBone source, VRCPhysBone destination)
         {
             // Vesrion
-            if (isKeepPBVersion) destination.version = source.version;
+            if (_isKeepPbVersion) destination.version = source.version;
 
             // Copy properties from source to destination
             destination.name = source.name;
@@ -360,7 +364,7 @@ namespace dev.kesera2.physbone_extractor
 
         private Transform GetArmatureTransform()
         {
-            if (prefabRoot == null) return null;
+            if (!prefabRoot) return null;
             return prefabRoot.GetComponentsInChildren<Transform>()
                 .FirstOrDefault(t => t.name.ToLower() == "armature");
         }
@@ -401,15 +405,13 @@ namespace dev.kesera2.physbone_extractor
         {
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (File.Exists(Settings.GetLogoPath()))
-                {
-                    byte[] fileData = File.ReadAllBytes(Settings.GetLogoPath());
-                    Texture2D logo = new Texture2D(2, 2); // サイズは後で自動調整される
-                    logo.LoadImage(fileData); // PNG, JPG 形式の画像をロード
-                    GUILayout.FlexibleSpace();
-                    EditorGUILayout.LabelField(new GUIContent(logo), GUILayout.Height(100), GUILayout.Width(400));
-                    GUILayout.FlexibleSpace();
-                }
+                if (!File.Exists(Settings.GetLogoPath())) return;
+                var fileData = File.ReadAllBytes(Settings.GetLogoPath());
+                var logo = new Texture2D(2, 2); // サイズは後で自動調整される
+                logo.LoadImage(fileData); // PNG, JPG 形式の画像をロード
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.LabelField(new GUIContent(logo), GUILayout.Height(100), GUILayout.Width(400));
+                GUILayout.FlexibleSpace();
             }
         }
 
@@ -423,7 +425,7 @@ namespace dev.kesera2.physbone_extractor
 
         private bool ValidatePrefabRoot()
         {
-            if (prefabRoot == null)
+            if (!prefabRoot)
             {
                 EditorGUILayout.HelpBox(Localization.S("warn.assign.prefab"), MessageType.Warning);
                 isSearchRootSet = false;
@@ -459,7 +461,7 @@ namespace dev.kesera2.physbone_extractor
                 message += "\n" + Localization.S("msg.dialog.keep.original");
             }
 
-            if (isKeepPBVersion)
+            if (_isKeepPbVersion)
             {
                 message += "\n" + Localization.S("msg.dialog.keep.pb.version");
             }
