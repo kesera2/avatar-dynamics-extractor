@@ -191,13 +191,15 @@ namespace dev.kesera2.physbone_extractor
 
         private bool CopyVRCContacts()
         {
-            return CopyVRCContactSender() && CopyVRCContactReceiver();
+            var contactsParent = new GameObject(Settings.ContactsGameObjectName);
+            contactsParent.transform.SetParent(_avatarDynamics.transform);
+            return CopyVRCContactSender(contactsParent) && CopyVRCContactReceiver(contactsParent);
         }
 
-        private bool CopyVRCContactSender()
+        private bool CopyVRCContactSender(GameObject parent)
         {
             var contactsParent = new GameObject(Settings.ContactSenderGameObjectName);
-            contactsParent.transform.SetParent(_avatarDynamics.transform);
+            contactsParent.transform.SetParent(parent.transform);
             var vrcContactSenders = new List<VRCContactSender>(searchRoot.GetComponentsInChildren<VRCContactSender>());
             foreach (var sourceContactSender in vrcContactSenders)
             {
@@ -219,10 +221,10 @@ namespace dev.kesera2.physbone_extractor
             return vrcContactSenders.Count > 0;
         }
 
-        private bool CopyVRCContactReceiver()
+        private bool CopyVRCContactReceiver(GameObject parent)
         {
             var contactsParent = new GameObject(Settings.ContactReceiverGameObjectName);
-            contactsParent.transform.SetParent(_avatarDynamics.transform);
+            contactsParent.transform.SetParent(parent.transform);
             var vrcContactReceivers = new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
             foreach (var sourceContactReceiver in vrcContactReceivers)
             {
