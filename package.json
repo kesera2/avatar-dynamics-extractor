@@ -1,13 +1,16 @@
 {
-  "name": "dev.kesera2.physbone-extractor",
-  "version": "1.0.1",
-  "displayName": "Physbone Extractor",
-  "description": "Extract Physbone and Physbone Collider and put into the avatar root as Avatar Dynamics",
+  "name": "dev.kesera2.avatar-dynamics-extractor",
+  "version": "2.0.0",
+  "displayName": "kesera2's Avatar Dynamics Extractor",
+  "description": "Extract Avatar Dynamics components such as Physbone, Physbone Collider, and Contacts, then place them in the avatar root as Avatar Dynamics",
   "author": {
     "name": "kesera2",
     "url": "https://github.com/kesera2/physbone-extractor"
   },
   "unity": "2022.3",
   "unityRelease": "22f1",
-  "license": "zlib"
+  "license": "zlib",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "2.0.0"
+  }
 }
