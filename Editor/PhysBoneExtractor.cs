@@ -154,6 +154,7 @@ namespace dev.kesera2.physbone_extractor
             }
 
             DisplayInfo();
+            ValidateSearchRoot();
             DisplayWarnSearchRoot();
         }
 
@@ -453,6 +454,18 @@ namespace dev.kesera2.physbone_extractor
 
             return true;
         }
+
+        private bool ValidateSearchRoot()
+        {
+            if (searchRoot.transform.parent != prefabRoot.transform)
+            {
+                EditorGUILayout.HelpBox(Localization.S("warn.search.root.not.child"), MessageType.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
 
         private void DisplayWarnSearchRoot()
         {

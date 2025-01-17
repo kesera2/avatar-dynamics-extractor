@@ -1,5 +1,5 @@
 ﻿{
-  "info.description": "アバタールートのGameObjectからPhysBoneとPhysBoneColliderを抽出します。\n検索先のGameObjectにはArmature以下の子オブジェクトを指定できます。",
+  "info.description": "アバタールートのGameObjectからPhysBoneとPhysBoneCollider、\nVRC Contact Sender/Receiverを抽出します。\nデフォルトで検索先のGameObjectはアバタールート内のArmatureオブジェクトが指定されます。",
   "label.prefab.root" : "アバタールートのGameObject",
   "label.search.root" : "検索先のGameObject",
   "label.name.avatar_dynamics": "AvatarDynamicsの名前",
@@ -14,6 +14,7 @@
   "warn.assign.avatar.root": "アバタールートを割り当ててください",
   "warn.assign.prefab": "シーンのアバタールートのPrefabを割り当ててください",
   "warn.need.assign.search.gameobject" : "検索先のGameObjectを割り当ててください",
+  "warn.search.root.not.child": "検索先のGameObjectはアバタールートの子オブジェクトではありません",
   "button.extract": "コンポーネントの抽出開始",
   "msg.dialog.title": "PhysBone Extractor",
   "msg.dialog.message": "実行してもよろしいですか？",
