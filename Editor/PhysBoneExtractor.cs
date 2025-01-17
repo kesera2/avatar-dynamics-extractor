@@ -280,9 +280,9 @@ namespace dev.kesera2.physbone_extractor
             contactsParent.transform.SetParent(_avatarDynamics.transform);
 
             var hasContactSender = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName,
-                CopyVRCContactSender, splitContacts);
+                CopyVRCContactSender, !splitContacts);
             var hasContactReceiver = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName,
-                CopyVRCContactReceiver, splitContacts);
+                CopyVRCContactReceiver, !splitContacts);
             if (!(hasContactSender && hasContactReceiver))
             {
                 DestroyImmediate(contactsParent);
