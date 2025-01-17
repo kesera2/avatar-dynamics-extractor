@@ -5,8 +5,8 @@ namespace dev.kesera2.physbone_extractor
 {
     public static class Settings
     {
-        public static readonly string ToolName = "PhysBone Extractor";
-        public const string WindowTitle = "Physbone Extractor";
+        private static readonly string ToolName = "PhysBone Extractor";
+        public static readonly string WindowTitle = ToolName;
         public const string AvatarDynamicsGameObjectName = "AvatarDynamics";
         public const string PhysboneGameObjectName = "PB";
         public const string PhysboneColliderGameObjectName = "PB_Colliders";
