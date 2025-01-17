@@ -77,17 +77,22 @@ namespace dev.kesera2.physbone_extractor
             {
                 using (new GUILayout.VerticalScope())
                 {
-                        EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
+                    EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
                     if (prefabRoot)
                     {
                         EditorGUILayout.LabelField(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.avatar_dynamics"), Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.avatar_dynamics"),
+                            Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("label.name.pb"), Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("label.name.pbc"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.contacts"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("option.separate.contacts"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.contact_sender"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.contact_receiver"), Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.contacts"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("option.separate.contacts"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.contact_sender"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.contact_receiver"),
+                            Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("option.remove.original"),
                             Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"),
@@ -131,8 +136,7 @@ namespace dev.kesera2.physbone_extractor
                     if (prefabRoot != null && searchRoot != null)
                     {
                         CreateAvatarDynamics();
-                        copiedPbCount =
-                            CopyComponent<VRCPhysBone>(_avatarDynamics, pbGameObjectName, CopyVRCPhysBone);
+                        copiedPbCount = CopyComponent<VRCPhysBone>(_avatarDynamics, pbGameObjectName, CopyVRCPhysBone);
                         copiedPbColliderCount = CopyComponent<VRCPhysBoneCollider>(_avatarDynamics,
                             pbColliderGameObjectName, CopyVRCPhysboneCollider);
                         var hasContacts = CopyVRCContacts();
@@ -259,7 +263,8 @@ namespace dev.kesera2.physbone_extractor
             var contactsParent = new GameObject(contactsGameObjectName);
             contactsParent.transform.SetParent(_avatarDynamics.transform);
 
-            copiedContactReceiverCount = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName,
+            copiedContactReceiverCount = CopyComponent<VRCContactReceiver>(contactsParent,
+                contactReceiverGameObjectName,
                 CopyVRCContactReceiver, !splitContacts);
             copiedContactSenderCount = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName,
                 CopyVRCContactSender, !splitContacts);
@@ -268,9 +273,9 @@ namespace dev.kesera2.physbone_extractor
             {
                 DestroyImmediate(contactsParent);
                 return false;
-            } else {
-                return true;
             }
+
+            return true;
         }
 
 
@@ -486,12 +491,13 @@ namespace dev.kesera2.physbone_extractor
                 "Cancel"
             );
         }
-        
+
         private void DisplayEndDialog()
         {
             EditorUtility.DisplayDialog(
                 Localization.S("msg.dialog.title"), // ダイアログのタイトル
-                string.Format(Localization.S("msg.dialog.end"), copiedPbCount, copiedPbColliderCount, copiedContactSenderCount, copiedContactReceiverCount), // メッセージ
+                string.Format(Localization.S("msg.dialog.end"), copiedPbCount, copiedPbColliderCount,
+                    copiedContactSenderCount, copiedContactReceiverCount), // メッセージ
                 "OK"
             );
         }
