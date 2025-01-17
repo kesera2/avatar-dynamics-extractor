@@ -11,6 +11,6 @@
   "unityRelease": "22f1",
   "license": "zlib",
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "2.0.0"
+    "com.unity.nuget.newtonsoft-json": "2.0.1"
   }
 }
