@@ -241,6 +241,15 @@ namespace dev.kesera2.physbone_extractor
                 {
                     if (!destCollider.rootTransform) destCollider.rootTransform = sourceCollider.transform;
                 }
+                else if (destComponent is VRCContactSender destSender && sourceComponent is VRCContactSender sourceSender)
+                {
+                    if (!destSender.rootTransform) destSender.rootTransform = sourceSender.transform;
+                }
+                else if (destComponent is VRCContactReceiver destReceiver &&
+                         sourceComponent is VRCContactReceiver sourceReceiver)
+                {
+                    if (!destReceiver.rootTransform) destReceiver.rootTransform = sourceReceiver.transform;
+                }
 
                 // Remove original component
                 if (isDeleteEnabled) DestroyImmediate(sourceComponent);
