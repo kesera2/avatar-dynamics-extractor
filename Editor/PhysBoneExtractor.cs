@@ -147,8 +147,8 @@ namespace dev.kesera2.physbone_extractor
                     if (prefabRoot != null && searchRoot != null)
                     {
                         CreateAvatarDynamics();
-                        var hasPhysbone = CopyPhysBones();
-                        var hasPhysboneCollider = CopyPhysBoneColliders();
+                        var hasPhysbone = CopyComponent<VRCPhysBone>(_avatarDynamics, pbGameObjectName, CopyVRCPhysBone);
+                        var hasPhysboneCollider = CopyComponent<VRCPhysBoneCollider>(_avatarDynamics, pbColliderGameObjectName, CopyVRCPhysboneCollider);
                         var hasContacts = CopyVRCContacts();
                         if (!(hasPhysbone || hasPhysboneCollider || hasContacts))
                             // Destroy the GameObject of AvatarDynamics if there is no target components.
@@ -186,142 +186,58 @@ namespace dev.kesera2.physbone_extractor
             _avatarDynamics = new GameObject(avatarDynamicsGameObjectName);
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
-
-        private bool CopyPhysBones()
+        
+        private bool CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction) where T : Component
         {
-            var pbParent = new GameObject(pbGameObjectName);
-            pbParent.transform.SetParent(_avatarDynamics.transform);
+            var componentsParent = new GameObject(gameObjectName);
+            componentsParent.transform.SetParent(parent.transform);
 
-            var vrcPhysBones = new List<VRCPhysBone>(searchRoot.GetComponentsInChildren<VRCPhysBone>());
+            var components = new List<T>(searchRoot.GetComponentsInChildren<T>());
 
-            foreach (var sourcePhysBone in vrcPhysBones)
+            foreach (var sourceComponent in components)
             {
-                var sourceTransform = sourcePhysBone.transform;
+                var sourceTransform = sourceComponent.transform;
                 // Create new GameObject and copy component
-                var newPhysBone = new GameObject(sourceTransform.name);
-                newPhysBone.transform.SetParent(pbParent.transform);
+                var newComponent = new GameObject(sourceTransform.name);
+                newComponent.transform.SetParent(componentsParent.transform);
 
-                // Copy the VRC Phys Bone component
-                var newVrcPhysBone = newPhysBone.AddComponent<VRCPhysBone>();
-                CopyVRCPhysBone(sourcePhysBone, newVrcPhysBone);
+                // Copy the component using the provided copy action
+                var destComponent = newComponent.AddComponent<T>();
+                copyAction(sourceComponent, destComponent);
 
-                // Set the Root Transform
-                if (!newVrcPhysBone.rootTransform) newVrcPhysBone.rootTransform = sourcePhysBone.transform;
+                // Set the Root Transform if applicable
+                if (destComponent is VRCPhysBone destPhysBone && sourceComponent is VRCPhysBone sourcePhysBone)
+                {
+                    if (!destPhysBone.rootTransform) destPhysBone.rootTransform = sourcePhysBone.transform;
+                }
+                else if (destComponent is VRCPhysBoneCollider destCollider && sourceComponent is VRCPhysBoneCollider sourceCollider)
+                {
+                    if (!destCollider.rootTransform) destCollider.rootTransform = sourceCollider.transform;
+                }
 
-                // Remove original VRC Phys Bone component
-                if (isDeleteEnabled) DestroyImmediate(sourcePhysBone);
+                // Remove original component
+                if (isDeleteEnabled) DestroyImmediate(sourceComponent);
             }
-
-            if (vrcPhysBones.Count == 0)
+            if (components.Count == 0)
             {
-                DestroyImmediate(pbParent);
+                DestroyImmediate(componentsParent);
             }
-
-            return vrcPhysBones.Count > 0;
-        }
-
-        private bool CopyPhysBoneColliders()
-        {
-            var pbColliderParent = new GameObject(pbColliderGameObjectName);
-            pbColliderParent.transform.SetParent(_avatarDynamics.transform);
-            var vrcPhysboneColliders =
-                new List<VRCPhysBoneCollider>(searchRoot.GetComponentsInChildren<VRCPhysBoneCollider>());
-            foreach (var sourcePbCollider in vrcPhysboneColliders)
-            {
-                var sourceTransform = sourcePbCollider.transform;
-                // Create new GameObject and copy component
-                var newCollider = new GameObject(sourceTransform.name);
-                newCollider.transform.SetParent(pbColliderParent.transform);
-
-                // Copy the VRC Phys Bone Collider component
-                var destPbCollider = newCollider.AddComponent<VRCPhysBoneCollider>();
-                CopyVRCPhysboneCollider(sourcePbCollider, destPbCollider);
-
-                // Set the Root Transform
-                if (!destPbCollider.rootTransform) destPbCollider.rootTransform = sourcePbCollider.transform;
-
-                // Remove original VRC Phys Bone Collider component
-                if (isDeleteEnabled) DestroyImmediate(sourcePbCollider);
-            }
-
-            if (vrcPhysboneColliders.Count == 0)
-            {
-                DestroyImmediate(pbColliderParent);
-            }
-
-            return vrcPhysboneColliders.Count > 0;
+            return components.Count > 0;
         }
 
         private bool CopyVRCContacts()
         {
             var contactsParent = new GameObject(contactsGameObjectName);
             contactsParent.transform.SetParent(_avatarDynamics.transform);
-            return CopyVRCContactSender(contactsParent) && CopyVRCContactReceiver(contactsParent);
-        }
-
-        private bool CopyVRCContactSender(GameObject parent)
-        {
-            var contactsParent = new GameObject(contactSenderGameObjectName);
-            contactsParent.transform.SetParent(parent.transform);
-            var vrcContactSenders = new List<VRCContactSender>(searchRoot.GetComponentsInChildren<VRCContactSender>());
-            foreach (var sourceContactSender in vrcContactSenders)
-            {
-                var sourceTransform = sourceContactSender.transform;
-                // Create new GameObject and copy component
-                var newContactSender = new GameObject(sourceTransform.name);
-                newContactSender.transform.SetParent(contactsParent.transform);
-
-                // Copy the VRC Contact Sender component
-                var destContactSender = newContactSender.AddComponent<VRCContactSender>();
-                CopyVRCContactSender(sourceContactSender, destContactSender);
-
-                // Set the Root Transform
-                if (!destContactSender.rootTransform) destContactSender.rootTransform = sourceContactSender.transform;
-
-                // Remove original VRC Contact Sender component
-                if (isDeleteEnabled) DestroyImmediate(sourceContactSender);
-            }
-
-            if (vrcContactSenders.Count == 0)
+            var hasContactSender = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName, CopyVRCContactSender);
+            var hasContactReceiver = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName, CopyVRCContactReceiver);
+            if (!(hasContactSender && hasContactReceiver))
             {
                 DestroyImmediate(contactsParent);
             }
-
-            return vrcContactSenders.Count > 0;
+            return hasContactSender && hasContactReceiver;
         }
 
-        private bool CopyVRCContactReceiver(GameObject parent)
-        {
-            var contactsParent = new GameObject(contactReceiverGameObjectName);
-            contactsParent.transform.SetParent(parent.transform);
-            var vrcContactReceivers =
-                new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
-            foreach (var sourceContactReceiver in vrcContactReceivers)
-            {
-                var sourceTransform = sourceContactReceiver.transform;
-                // Create new GameObject and copy component
-                var newContactReceiver = new GameObject(sourceTransform.name);
-                newContactReceiver.transform.SetParent(contactsParent.transform);
-
-                // Copy the VRC Contact Receiver component
-                var destContactReceiver = newContactReceiver.AddComponent<VRCContactReceiver>();
-                CopyVRCContactReceiver(sourceContactReceiver, destContactReceiver);
-
-                // Set the Root Transform
-                if (!destContactReceiver.rootTransform)
-                    destContactReceiver.rootTransform = sourceContactReceiver.transform;
-
-                // Remove original VRC Contact Receiver component
-                if (isDeleteEnabled) DestroyImmediate(sourceContactReceiver);
-            }
-
-            if (vrcContactReceivers.Count == 0)
-            {
-                DestroyImmediate(contactsParent);
-            }
-
-            return vrcContactReceivers.Count > 0;
-        }
 
         private void CopyVRCPhysBone(VRCPhysBone source, VRCPhysBone destination)
         {
