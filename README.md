@@ -1,3 +1,4 @@
+![Logo](https://github.com/kesera2/avatar-dynamics-extractor/blob/main/Editor/Images/avatar-dynamics-extractor-logo.png)
 # Avatar Dynamics Extractor
 VRChat向けUnity拡張Editor。指定したアバターのPhysboneやPhysbone Collider、Contact Sender/ReceiverをAvatar Dynamicsとしてまとめてコピーします
 
