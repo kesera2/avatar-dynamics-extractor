@@ -14,5 +14,6 @@
   "msg.dialog.keep.original": "Original components will be kept.",
   "msg.dialog.remove.original": "Original components will be removed.",
   "msg.dialog.keep.pb.version": "The version of Physbone will be kept.",
-  "msg.dialog.update.pb.version": "The version of Physbone will be updated."
+  "msg.dialog.update.pb.version": "The version of Physbone will be updated.",
+  "msg.dialog.end": "Extraction is complete.\n\nPhysbone: {0}\nPhysboneCollider: {1}\nContact Sender: {2}\nContact Receiver: {3}",
 }

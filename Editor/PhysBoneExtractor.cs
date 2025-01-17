@@ -22,6 +22,10 @@ namespace dev.kesera2.physbone_extractor
         private string pbGameObjectName;
         private string pbColliderGameObjectName;
         private string contactsGameObjectName;
+        private int copiedPbCount;
+        private int copiedPbColliderCount;
+        private int copiedContactSenderCount;
+        private int copiedContactReceiverCount;
         private bool splitContacts;
         private string contactSenderGameObjectName;
         private string contactReceiverGameObjectName;
@@ -127,12 +131,12 @@ namespace dev.kesera2.physbone_extractor
                     if (prefabRoot != null && searchRoot != null)
                     {
                         CreateAvatarDynamics();
-                        var hasPhysbone =
+                        copiedPbCount =
                             CopyComponent<VRCPhysBone>(_avatarDynamics, pbGameObjectName, CopyVRCPhysBone);
-                        var hasPhysboneCollider = CopyComponent<VRCPhysBoneCollider>(_avatarDynamics,
+                        copiedPbColliderCount = CopyComponent<VRCPhysBoneCollider>(_avatarDynamics,
                             pbColliderGameObjectName, CopyVRCPhysboneCollider);
                         var hasContacts = CopyVRCContacts();
-                        if (!(hasPhysbone || hasPhysboneCollider || hasContacts))
+                        if (!(copiedPbCount > 0 || copiedPbColliderCount > 0 || hasContacts))
                             // Destroy the GameObject of AvatarDynamics if there is no target components.
                             DestroyImmediate(_avatarDynamics);
                     }
@@ -140,6 +144,8 @@ namespace dev.kesera2.physbone_extractor
                     {
                         Debug.LogWarning("Please assign both Target and Search Root GameObjects.");
                     }
+
+                    DisplayEndDialog();
                 }
             }
 
@@ -188,7 +194,7 @@ namespace dev.kesera2.physbone_extractor
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
 
-        private bool CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction,
+        private int CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction,
             bool useParentGameObject = false) where T : Component
         {
             GameObject componentsParent;
@@ -240,12 +246,12 @@ namespace dev.kesera2.physbone_extractor
                 if (isDeleteEnabled) DestroyImmediate(sourceComponent);
             }
 
-            if (components.Count == 0)
+            if (components.Count == 0 && !useParentGameObject)
             {
                 DestroyImmediate(componentsParent);
             }
 
-            return components.Count > 0;
+            return components.Count;
         }
 
         private bool CopyVRCContacts()
@@ -253,16 +259,18 @@ namespace dev.kesera2.physbone_extractor
             var contactsParent = new GameObject(contactsGameObjectName);
             contactsParent.transform.SetParent(_avatarDynamics.transform);
 
-            var hasContactSender = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName,
-                CopyVRCContactSender, !splitContacts);
-            var hasContactReceiver = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName,
+            copiedContactReceiverCount = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName,
                 CopyVRCContactReceiver, !splitContacts);
-            if (!(hasContactSender && hasContactReceiver))
+            copiedContactSenderCount = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName,
+                CopyVRCContactSender, !splitContacts);
+
+            if (copiedContactReceiverCount == 0 && copiedContactSenderCount == 0)
             {
                 DestroyImmediate(contactsParent);
+                return false;
+            } else {
+                return true;
             }
-
-            return hasContactSender && hasContactReceiver;
         }
 
 
@@ -476,6 +484,15 @@ namespace dev.kesera2.physbone_extractor
                 message, // メッセージ
                 "OK",
                 "Cancel"
+            );
+        }
+        
+        private void DisplayEndDialog()
+        {
+            EditorUtility.DisplayDialog(
+                Localization.S("msg.dialog.title"), // ダイアログのタイトル
+                String.Format(Localization.S("msg.dialog.end"), copiedPbCount, copiedPbColliderCount, copiedContactSenderCount, copiedContactReceiverCount), // メッセージ
+                "OK"
             );
         }
     }

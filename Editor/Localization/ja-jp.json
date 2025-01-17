@@ -14,5 +14,6 @@
   "msg.dialog.keep.original": "コピー元のコンポーネントは削除されず保持されます。",
   "msg.dialog.remove.original": "コピー元のコンポーネントは削除されます。",
   "msg.dialog.keep.pb.version": "コピー先のPhysboneのバージョンは維持されます。",
-  "msg.dialog.update.pb.version": "コピー先のPhysboneのバージョンは更新されます。"
+  "msg.dialog.update.pb.version": "コピー先のPhysboneのバージョンは更新されます。",
+  "msg.dialog.end": "抽出が完了しました。\n\nPhysbone: {0}件\nPhysboneCollider: {1}件\nContact Sender: {2}件\nContact Receiver: {3}件",
 }
