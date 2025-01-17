@@ -86,37 +86,37 @@ namespace dev.kesera2.physbone_extractor
                 searchRoot =
                     (GameObject)EditorGUILayout.ObjectField(searchRoot, typeof(GameObject), true);
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label("AvatarDynamicsの名前", Settings.LabelGuiLayoutOptions);
                 avatarDynamicsGameObjectName = EditorGUILayout.TextField(avatarDynamicsGameObjectName);
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label("PhysBoneの名前", Settings.LabelGuiLayoutOptions);
                 pbGameObjectName = EditorGUILayout.TextField(pbGameObjectName);
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label("PhysBoneColliderの名前", Settings.LabelGuiLayoutOptions);
                 pbColliderGameObjectName = EditorGUILayout.TextField(pbColliderGameObjectName);
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label("Contactsの名前", Settings.LabelGuiLayoutOptions);
                 contactsGameObjectName = EditorGUILayout.TextField(contactsGameObjectName);
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label("ContactSenderの名前", Settings.LabelGuiLayoutOptions);
                 contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label("ContactReceiverの名前", Settings.LabelGuiLayoutOptions);
@@ -186,7 +186,7 @@ namespace dev.kesera2.physbone_extractor
             _avatarDynamics = new GameObject(avatarDynamicsGameObjectName);
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
-        
+
         private bool CopyPhysBones()
         {
             var pbParent = new GameObject(pbGameObjectName);
@@ -211,9 +211,12 @@ namespace dev.kesera2.physbone_extractor
                 // Remove original VRC Phys Bone component
                 if (isDeleteEnabled) DestroyImmediate(sourcePhysBone);
             }
-            if(vrcPhysBones.Count == 0) {
+
+            if (vrcPhysBones.Count == 0)
+            {
                 DestroyImmediate(pbParent);
             }
+
             return vrcPhysBones.Count > 0;
         }
 
@@ -240,9 +243,12 @@ namespace dev.kesera2.physbone_extractor
                 // Remove original VRC Phys Bone Collider component
                 if (isDeleteEnabled) DestroyImmediate(sourcePbCollider);
             }
-            if (vrcPhysboneColliders.Count == 0) {
+
+            if (vrcPhysboneColliders.Count == 0)
+            {
                 DestroyImmediate(pbColliderParent);
             }
+
             return vrcPhysboneColliders.Count > 0;
         }
 
@@ -275,9 +281,12 @@ namespace dev.kesera2.physbone_extractor
                 // Remove original VRC Contact Sender component
                 if (isDeleteEnabled) DestroyImmediate(sourceContactSender);
             }
-            if (vrcContactSenders.Count == 0) {
+
+            if (vrcContactSenders.Count == 0)
+            {
                 DestroyImmediate(contactsParent);
             }
+
             return vrcContactSenders.Count > 0;
         }
 
@@ -285,7 +294,8 @@ namespace dev.kesera2.physbone_extractor
         {
             var contactsParent = new GameObject(contactReceiverGameObjectName);
             contactsParent.transform.SetParent(parent.transform);
-            var vrcContactReceivers = new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
+            var vrcContactReceivers =
+                new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
             foreach (var sourceContactReceiver in vrcContactReceivers)
             {
                 var sourceTransform = sourceContactReceiver.transform;
@@ -298,14 +308,18 @@ namespace dev.kesera2.physbone_extractor
                 CopyVRCContactReceiver(sourceContactReceiver, destContactReceiver);
 
                 // Set the Root Transform
-                if (!destContactReceiver.rootTransform) destContactReceiver.rootTransform = sourceContactReceiver.transform;
+                if (!destContactReceiver.rootTransform)
+                    destContactReceiver.rootTransform = sourceContactReceiver.transform;
 
                 // Remove original VRC Contact Receiver component
                 if (isDeleteEnabled) DestroyImmediate(sourceContactReceiver);
             }
-            if (vrcContactReceivers.Count == 0) {
+
+            if (vrcContactReceivers.Count == 0)
+            {
                 DestroyImmediate(contactsParent);
             }
+
             return vrcContactReceivers.Count > 0;
         }
 
@@ -313,17 +327,17 @@ namespace dev.kesera2.physbone_extractor
         {
             // Vesrion
             if (isKeepPBVersion) destination.version = source.version;
-            
+
             // Copy properties from source to destination
             destination.name = source.name;
             destination.enabled = source.enabled;
-            
+
             // Transforms
             destination.rootTransform = source.rootTransform;
             destination.ignoreTransforms = source.ignoreTransforms;
             destination.endpointPosition = source.endpointPosition;
             destination.multiChildType = source.multiChildType;
-            
+
             // Forces
             destination.integrationType = source.integrationType;
             destination.pull = source.pull;
@@ -339,7 +353,7 @@ namespace dev.kesera2.physbone_extractor
             destination.immobileType = source.immobileType;
             destination.immobile = source.immobile;
             destination.immobileCurve = source.immobileCurve;
-            
+
             // Limits
             destination.limitType = source.limitType;
             destination.maxAngleX = source.maxAngleX;
@@ -352,14 +366,14 @@ namespace dev.kesera2.physbone_extractor
             destination.limitRotationXCurve = source.limitRotationXCurve;
             destination.limitRotationYCurve = source.limitRotationYCurve;
             destination.limitRotationZCurve = source.limitRotationZCurve;
-            
+
             // Colliders
             destination.radius = source.radius;
             destination.radiusCurve = source.radiusCurve;
             destination.allowCollision = source.allowCollision;
             destination.colliders = source.colliders;
             destination.collisionFilter = source.collisionFilter;
-            
+
             // Stretch & Squish
             destination.maxStretch = source.maxStretch;
             destination.maxStretchCurve = source.maxStretchCurve;
@@ -367,7 +381,7 @@ namespace dev.kesera2.physbone_extractor
             destination.stretchMotionCurve = source.stretchMotionCurve;
             destination.maxSquish = source.maxSquish;
             destination.maxSquishCurve = source.maxSquishCurve;
-            
+
             // Grab & Pose
             destination.allowGrabbing = source.allowGrabbing;
             destination.allowPosing = source.allowPosing;
@@ -375,12 +389,12 @@ namespace dev.kesera2.physbone_extractor
             destination.snapToHand = source.snapToHand;
             // destination.grabFilter = source.grabFilter;
             // destination.poseFilter = source.poseFilter;
-            
+
             // Options
             destination.parameter = source.parameter;
             destination.isAnimated = source.isAnimated;
             destination.resetWhenDisabled = source.resetWhenDisabled;
-            
+
             // Gizmos
             destination.showGizmos = source.showGizmos;
             destination.boneOpacity = source.boneOpacity;
