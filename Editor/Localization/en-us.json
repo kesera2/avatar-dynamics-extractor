@@ -1,7 +1,7 @@
 ﻿{
   "info.description": "Extract PhysBone and PhysBoneCollider from the avatar root GameObject.\nYou can specify the child objects under Armature as the search destination GameObject.",
-  "label.prefab.root" : "avatar root GameObject",
-  "label.search.root" : "search root GameObject",
+  "label.prefab.root" : "Avatar root GameObject",
+  "label.search.root" : "Search root GameObject",
   "label.name.avatar_dynamics": "Name of AvatarDynamics",
   "label.name.pb": "Name of PhysBone",
   "label.name.pbc": "Name of PhysBoneCollider",
