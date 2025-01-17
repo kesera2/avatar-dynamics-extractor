@@ -26,6 +26,7 @@ namespace dev.kesera2.physbone_extractor
         private string contactSenderGameObjectName;
         private string contactReceiverGameObjectName;
         private bool isSearchRootSet;
+        private bool prefabRootChanged;
 
         [MenuItem("Tools/kesera2/PhysBone Extractor")]
         public static void ShowWindow()
@@ -73,20 +74,7 @@ namespace dev.kesera2.physbone_extractor
             {
                 return;
             }
-
-            _avatarArmature = GetArmatureTransform();
-            if (_avatarArmature && !isSearchRootSet)
-            {
-                searchRoot = _avatarArmature.gameObject;
-                isSearchRootSet = true;
-            }
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                GUILayout.Label(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
-                searchRoot =
-                    (GameObject)EditorGUILayout.ObjectField(searchRoot, typeof(GameObject), true);
-            }
+            DrawSearchRootField();
 
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -182,13 +170,36 @@ namespace dev.kesera2.physbone_extractor
             DisplayWarnSearchRoot();
         }
 
+        private void DrawSearchRootField()
+        {
+            _avatarArmature = GetArmatureTransform();
+            if ((_avatarArmature && !isSearchRootSet) || prefabRootChanged)
+            {
+                searchRoot = _avatarArmature.gameObject;
+                isSearchRootSet = true;
+                prefabRootChanged = false;
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
+                searchRoot =
+                    (GameObject)EditorGUILayout.ObjectField(searchRoot, typeof(GameObject), true);
+            }
+        }
+
         private void DrawAvatarRootField()
         {
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
-                prefabRoot = (GameObject)EditorGUILayout.ObjectField(prefabRoot,
+                var avatarRoot = (GameObject)EditorGUILayout.ObjectField(prefabRoot,
                     typeof(GameObject), true);
+                if (avatarRoot != prefabRoot)
+                {
+                    prefabRootChanged = true;
+                }
+                prefabRoot = avatarRoot;
             }
         }
 
@@ -379,8 +390,12 @@ namespace dev.kesera2.physbone_extractor
 
         private Transform GetArmatureTransform()
         {
-            return prefabRoot.GetComponentsInChildren<Transform>()
-                .FirstOrDefault(t => t.name.ToLower() == "armature");
+            // if (!(prefabRoot && searchRoot))
+            // {
+                // Debug.Log("GetArmatureTransform is called");
+            // }
+                return prefabRoot.GetComponentsInChildren<Transform>()
+                    .FirstOrDefault(t => t.name.ToLower() == "armature");
         }
 
         private void CopyVRCContactSender(VRCContactSender source, VRCContactSender destination)
