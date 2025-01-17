@@ -211,7 +211,9 @@ namespace dev.kesera2.physbone_extractor
                 // Remove original VRC Phys Bone component
                 if (isDeleteEnabled) DestroyImmediate(sourcePhysBone);
             }
-
+            if(vrcPhysBones.Count == 0) {
+                DestroyImmediate(pbParent);
+            }
             return vrcPhysBones.Count > 0;
         }
 
@@ -238,7 +240,9 @@ namespace dev.kesera2.physbone_extractor
                 // Remove original VRC Phys Bone Collider component
                 if (isDeleteEnabled) DestroyImmediate(sourcePbCollider);
             }
-
+            if (vrcPhysboneColliders.Count == 0) {
+                DestroyImmediate(pbColliderParent);
+            }
             return vrcPhysboneColliders.Count > 0;
         }
 
@@ -271,6 +275,9 @@ namespace dev.kesera2.physbone_extractor
                 // Remove original VRC Contact Sender component
                 if (isDeleteEnabled) DestroyImmediate(sourceContactSender);
             }
+            if (vrcContactSenders.Count == 0) {
+                DestroyImmediate(contactsParent);
+            }
             return vrcContactSenders.Count > 0;
         }
 
@@ -295,6 +302,9 @@ namespace dev.kesera2.physbone_extractor
 
                 // Remove original VRC Contact Receiver component
                 if (isDeleteEnabled) DestroyImmediate(sourceContactReceiver);
+            }
+            if (vrcContactReceivers.Count == 0) {
+                DestroyImmediate(contactsParent);
             }
             return vrcContactReceivers.Count > 0;
         }
