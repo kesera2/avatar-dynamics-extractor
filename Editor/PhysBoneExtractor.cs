@@ -22,6 +22,7 @@ namespace dev.kesera2.physbone_extractor
         private string pbGameObjectName;
         private string pbColliderGameObjectName;
         private string contactsGameObjectName;
+        private bool splitContacts;
         private string contactSenderGameObjectName;
         private string contactReceiverGameObjectName;
         private bool isSearchRootSet;
@@ -56,7 +57,7 @@ namespace dev.kesera2.physbone_extractor
                 GUILayout.FlexibleSpace();
                 var selectedLanguage =
                     EditorGUILayout.Popup(_selectedLanguage, Localization.DisplayNames,
-                        Settings.LanguagGuiLayoutOptions);
+                        Settings.LanguageGuiLayoutOptions);
                 if (_selectedLanguage != selectedLanguage)
                     Localization.LoadLocalization(Localization.SupportedLanguages[selectedLanguage]);
                 _selectedLanguage = selectedLanguage;
@@ -113,16 +114,30 @@ namespace dev.kesera2.physbone_extractor
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                GUILayout.Label("ContactSenderの名前", Settings.LabelGuiLayoutOptions);
-                contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
+                GUILayout.Label("Contactsを分類分けする", Settings.LabelGuiLayoutOptions);
+                splitContacts = EditorGUILayout.Toggle(splitContacts);
             }
+            
 
-            using (new EditorGUILayout.HorizontalScope())
+            using (new EditorGUI.DisabledScope(!splitContacts))
             {
-                GUILayout.Label("ContactReceiverの名前", Settings.LabelGuiLayoutOptions);
-                contactReceiverGameObjectName = EditorGUILayout.TextField(contactReceiverGameObjectName);
-            }
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField("ContactSenderの名前", Settings.LabelIndentGuiLayoutOptions);
+                        contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
+                    }
 
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField("ContactReceiverの名前", Settings.LabelIndentGuiLayoutOptions);
+                        contactReceiverGameObjectName = EditorGUILayout.TextField(contactReceiverGameObjectName);
+                    }
+                }
+            }
+            
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Label(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
@@ -187,10 +202,18 @@ namespace dev.kesera2.physbone_extractor
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
         
-        private bool CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction) where T : Component
+        private bool CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction, bool useParentGameObject = false) where T : Component
         {
-            var componentsParent = new GameObject(gameObjectName);
-            componentsParent.transform.SetParent(parent.transform);
+            GameObject componentsParent;
+            if (useParentGameObject)
+            {
+                componentsParent = parent;
+            }
+            else
+            {
+                componentsParent = new GameObject(gameObjectName);
+                componentsParent.transform.SetParent(parent.transform);
+            }
 
             var components = new List<T>(searchRoot.GetComponentsInChildren<T>());
 
@@ -199,7 +222,7 @@ namespace dev.kesera2.physbone_extractor
                 var sourceTransform = sourceComponent.transform;
                 // Create new GameObject and copy component
                 var newComponent = new GameObject(sourceTransform.name);
-                newComponent.transform.SetParent(componentsParent.transform);
+                newComponent.transform.SetParent(useParentGameObject ? parent.transform : componentsParent.transform);
 
                 // Copy the component using the provided copy action
                 var destComponent = newComponent.AddComponent<T>();
@@ -229,8 +252,9 @@ namespace dev.kesera2.physbone_extractor
         {
             var contactsParent = new GameObject(contactsGameObjectName);
             contactsParent.transform.SetParent(_avatarDynamics.transform);
-            var hasContactSender = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName, CopyVRCContactSender);
-            var hasContactReceiver = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName, CopyVRCContactReceiver);
+            
+            var hasContactSender = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName, CopyVRCContactSender, splitContacts);
+            var hasContactReceiver = CopyComponent<VRCContactReceiver>(contactsParent, contactReceiverGameObjectName, CopyVRCContactReceiver, splitContacts);
             if (!(hasContactSender && hasContactReceiver))
             {
                 DestroyImmediate(contactsParent);

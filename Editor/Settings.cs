@@ -17,13 +17,18 @@ namespace dev.kesera2.physbone_extractor
         public static readonly string ImagesPathRoot = AssetDatabase.GUIDToAssetPath(ImagesFolderGuid);
         public static readonly string logoFileName = "pb-extractor-logo.png";
         public static readonly Vector2 windowMinSize = new Vector2(450, 400);
-        public static GUILayoutOption[] LanguagGuiLayoutOptions
+        public static GUILayoutOption[] LanguageGuiLayoutOptions
         {
             get { return new [] { GUILayout.Width(100) } ; }
         }
         public static GUILayoutOption[] LabelGuiLayoutOptions
         {
             get { return new [] { GUILayout.Width(250) } ; }
+        }
+        
+        public static GUILayoutOption[] LabelIndentGuiLayoutOptions
+        {
+            get { return new [] { GUILayout.Width(237.25f) } ; }
         }
         
         public static string GetLogoPath()
