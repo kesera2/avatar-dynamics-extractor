@@ -144,6 +144,7 @@ namespace dev.kesera2.physbone_extractor
                         if (!(copiedPbComponents.Count > 0 || copiedPbColliderComponents.Count > 0 || hasContacts))
                             // Destroy the GameObject of AvatarDynamics if there is no target components.
                             DestroyImmediate(_avatarDynamics);
+                        RemoveOriginalComponent();
                         ChangeOrder();
                     }
                     else
@@ -246,18 +247,25 @@ namespace dev.kesera2.physbone_extractor
             bool useParentGameObject = false) where T : Component
         {
             GameObject componentsParent;
+            
+            // Create a parent GameObject for the copied components
             if (useParentGameObject)
             {
                 componentsParent = parent;
             }
             else
             {
+                // Create a new GameObject if the parent GameObject is not used
                 componentsParent = new GameObject(gameObjectName);
                 componentsParent.transform.SetParent(parent.transform);
             }
 
+            // Get all components of the specified type
             var components = new List<T>(searchRoot.GetComponentsInChildren<T>());
-
+            
+            // Create a list to store the copied components
+            var destComponents = new List<T>();
+            
             foreach (var sourceComponent in components)
             {
                 var sourceTransform = sourceComponent.transform;
@@ -268,7 +276,10 @@ namespace dev.kesera2.physbone_extractor
                 // Copy the component using the provided copy action
                 var destComponent = newComponent.AddComponent<T>();
                 copyAction(sourceComponent, destComponent);
-
+                
+                // Add the copied component to the list
+                destComponents.Add(destComponent);
+                
                 // Set the Root Transform if applicable
                 if (destComponent is VRCPhysBone destPhysBone && sourceComponent is VRCPhysBone sourcePhysBone)
                 {
@@ -289,9 +300,6 @@ namespace dev.kesera2.physbone_extractor
                 {
                     if (!destReceiver.rootTransform) destReceiver.rootTransform = sourceReceiver.transform;
                 }
-
-                // Remove original component
-                if (isDeleteEnabled) DestroyImmediate(sourceComponent);
             }
 
             if (components.Count == 0 && !useParentGameObject)
@@ -299,7 +307,7 @@ namespace dev.kesera2.physbone_extractor
                 DestroyImmediate(componentsParent);
             }
 
-            return components;
+            return destComponents;
         }
 
         private bool CopyVRCContacts()
@@ -371,8 +379,9 @@ namespace dev.kesera2.physbone_extractor
             destination.radius = source.radius;
             destination.radiusCurve = source.radiusCurve;
             destination.allowCollision = source.allowCollision;
-            destination.colliders = new List<VRCPhysBoneColliderBase>(copiedPbColliderComponents.Where(x => source.colliders.Any(y => y.name == x.name))
-                .ToList());
+            destination.colliders = new List<VRCPhysBoneColliderBase>(from sourceCollider in source.colliders
+                join copiedCollider in copiedPbColliderComponents on sourceCollider.name equals copiedCollider.name
+                select copiedCollider).ToList();
             destination.collisionFilter = source.collisionFilter;
 
             // Stretch & Squish
@@ -458,6 +467,20 @@ namespace dev.kesera2.physbone_extractor
             destination.minVelocity = source.minVelocity;
         }
 
+        private void RemoveOriginalComponent()
+        {
+            if (isDeleteEnabled)
+            {
+                var physboneComponents = new List<VRCPhysBone>(searchRoot.GetComponentsInChildren<VRCPhysBone>());
+                physboneComponents.ForEach(DestroyImmediate);
+                var physboneColliderComponents = new List<VRCPhysBoneCollider>(searchRoot.GetComponentsInChildren<VRCPhysBoneCollider>());
+                physboneColliderComponents.ForEach(DestroyImmediate);
+                var contactSenderComponents = new List<VRCContactSender>(searchRoot.GetComponentsInChildren<VRCContactSender>());
+                contactSenderComponents.ForEach(DestroyImmediate);
+                var contactReceiverComponents = new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
+                contactReceiverComponents.ForEach(DestroyImmediate);
+            }
+        }
 
         private static void DrawLogo()
         {
