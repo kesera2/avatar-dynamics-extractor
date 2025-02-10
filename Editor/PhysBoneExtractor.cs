@@ -166,6 +166,11 @@ namespace dev.kesera2.physbone_extractor
          */
         private void ChangeOrder()
         {
+            if (copiedPbComponents.Count == 0 && copiedPbColliderComponents.Count == 0 &&
+                copiedContactSenderComponents.Count == 0 && copiedContactReceiverComponents.Count == 0)
+            {
+                return;
+            }
             // Define the order of the child objects
             string[] order =
             {
