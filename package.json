@@ -1,6 +1,6 @@
 {
   "name": "dev.kesera2.avatar-dynamics-extractor",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "displayName": "kesera2's Avatar Dynamics Extractor",
   "description": "Extract Avatar Dynamics components such as Physbone, Physbone Collider, and Contacts, then place them in the avatar root as Avatar Dynamics",
   "author": {
