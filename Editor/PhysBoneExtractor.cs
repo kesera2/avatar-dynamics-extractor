@@ -438,7 +438,7 @@ namespace dev.kesera2.physbone_extractor
         {
             if (!prefabRoot) return null;
             return prefabRoot.GetComponentsInChildren<Transform>()
-                .FirstOrDefault(t => t.name.ToLower().StartsWith("armature"));
+                .FirstOrDefault(t => t.name.ToLower() == "armature");
         }
 
         private void CopyVRCContactSender(VRCContactSender source, VRCContactSender destination)
