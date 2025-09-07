@@ -1,5 +1,5 @@
 ﻿{
-  "info.description": "アバタールートのGameObjectからPhysBoneとPhysBoneCollider、\nVRC Contact Sender/Receiverを抽出します。\nデフォルトで検索先のGameObjectはアバタールート内のArmatureオブジェクトが指定されます。",
+  "info.description": "アバタールートのGameObjectからPhysBone、PhysBoneCollider、\nVRC Contact Sender/Receiver、(Unity/VRC)Constraintsを抽出します。\nUnity ConstraintはVRCConstraintに変換され削除されます。\nデフォルトで検索先のGameObjectはアバタールート内のArmatureオブジェクトが指定されます。",
   "label.prefab.root" : "アバタールートのGameObject",
   "label.search.root" : "検索先のGameObject",
   "label.name.avatar_dynamics": "AvatarDynamicsの名前",
@@ -8,6 +8,13 @@
   "label.name.contacts": "Contactsの名前",
   "label.name.contact_sender": "ContactSenderの名前",
   "label.name.contact_receiver": "ContactReceiverの名前",
+  "label.name.constraints": "Constraintsの名前",
+  "label.name.position_constraints": "Position Constraintsの名前",
+  "label.name.rotation_constraints": "Rotation Constraintsの名前",
+  "label.name.scale_constraints": "Scale Constraintsの名前",
+  "label.name.parent_constraints": "Parent Constraintsの名前",
+  "label.name.aim_constraints": "Aim Constraintsの名前",
+  "label.name.lookat_constraints": "LookAt Constraintsの名前",
   "option.remove.original": "オリジナルのコンポーネントを削除する",
   "option.separate.contacts": "Contactsを分類分けする",
   "option.keep.pb.version": "オリジナルのPhysBoneのバージョンを維持する",
@@ -22,5 +29,5 @@
   "msg.dialog.remove.original": "コピー元のコンポーネントは削除されます。",
   "msg.dialog.keep.pb.version": "コピー先のPhysboneのバージョンは維持されます。",
   "msg.dialog.update.pb.version": "コピー先のPhysboneのバージョンは更新されます。",
-  "msg.dialog.end": "抽出が完了しました。\n\nPhysbone: {0}件\nPhysboneCollider: {1}件\nContact Sender: {2}件\nContact Receiver: {3}件"
+  "msg.dialog.end": "抽出が完了しました。\n\nPhysbone: {0}件\nPhysboneCollider: {1}件\nContact Sender: {2}件\nContact Receiver: {3}件\nConstraints: {4}件"
 }

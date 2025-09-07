@@ -13,6 +13,13 @@ namespace dev.kesera2.physbone_extractor
         public const string ContactsGameObjectName = "Contacts";
         public const string ContactSenderGameObjectName = "ContactSender";
         public const string ContactReceiverGameObjectName = "ContactReceiver";
+        public const string ConstraintsGameObjectName = "Constraints";
+        public const string VrcPositionConstraintName = "VRCPositionConstraint";
+        public const string VrcRotationConstraintName = "VRCRotationConstraint";
+        public const string VrcParentConstraintName = "VRCParentConstraint";
+        public const string VrcScaleConstraintName = "VRCScaleConstraint";
+        public const string VrcAimConstraintName = "VRCAimConstraint";
+        public const string VrcLookAtConstraintName = "VRCLookAtConstraint";
         private const string ImagesFolderGuid = "02ea7ce10f74d444080eff72897e0c7e";
         private static readonly string ImagesPathRoot = AssetDatabase.GUIDToAssetPath(ImagesFolderGuid);
         private const string LogoFileName = "avatar-dynamics-extractor-logo.png";
