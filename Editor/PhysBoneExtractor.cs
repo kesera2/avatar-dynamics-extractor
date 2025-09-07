@@ -4,9 +4,14 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Animations;
 using VRC.Dynamics;
+using VRC.SDK3.Avatars;
+using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Dynamics.Constraint.Components;
 using VRC.SDK3.Dynamics.Contact.Components;
 using VRC.SDK3.Dynamics.PhysBone.Components;
+using YamlDotNet.Core;
 
 namespace dev.kesera2.physbone_extractor
 {
@@ -25,14 +30,22 @@ namespace dev.kesera2.physbone_extractor
         private string contactsGameObjectName;
         private string contactSenderGameObjectName;
         private string contactReceiverGameObjectName;
+        private string constraintsGameObjectName;
+        private string vrcPositionConstraintName;
+        private string vrcRotationConstraintName;
+        private string vrcParentConstraintName;
+        private string vrcScaleConstraintName;
+        private string vrcAimConstraintName;
+        private string vrcLookAtConstraintName;
         private List<VRCPhysBone> copiedPbComponents;
         private List<VRCPhysBoneCollider> copiedPbColliderComponents;
         private List<VRCContactSender> copiedContactSenderComponents;
         private List<VRCContactReceiver> copiedContactReceiverComponents;
+        private List<VRCConstraintBase> copiedConstraintComponents;
         private bool splitContacts;
         private bool isSearchRootSet;
         private bool prefabRootChanged;
-        
+
         [MenuItem("Tools/kesera2/Avatar Dynamics Extractor")]
         public static void ShowWindow()
         {
@@ -54,6 +67,13 @@ namespace dev.kesera2.physbone_extractor
             contactsGameObjectName ??= Settings.ContactsGameObjectName;
             contactSenderGameObjectName ??= Settings.ContactSenderGameObjectName;
             contactReceiverGameObjectName ??= Settings.ContactReceiverGameObjectName;
+            constraintsGameObjectName ??= Settings.ConstraintsGameObjectName;
+            vrcPositionConstraintName ??= Settings.VrcPositionConstraintName;
+            vrcRotationConstraintName ??= Settings.VrcRotationConstraintName;
+            vrcParentConstraintName ??= Settings.VrcParentConstraintName;
+            vrcScaleConstraintName ??= Settings.VrcScaleConstraintName;
+            vrcAimConstraintName ??= Settings.VrcAimConstraintName;
+            vrcLookAtConstraintName ??= Settings.VrcLookAtConstraintName;
         }
 
         private void DrawSelectLanguage()
@@ -94,6 +114,20 @@ namespace dev.kesera2.physbone_extractor
                             Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("label.name.contact_receiver"),
                             Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.constraints"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.position_constraints"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.rotation_constraints"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.parent_constraints"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.scale_constraints"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.aim_constraints"),
+                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.lookat_constraints"),
+                            Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("option.remove.original"),
                             Settings.LabelGuiLayoutOptions);
                         EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"),
@@ -117,7 +151,13 @@ namespace dev.kesera2.physbone_extractor
                             contactSenderGameObjectName = EditorGUILayout.TextField(contactSenderGameObjectName);
                             contactReceiverGameObjectName = EditorGUILayout.TextField(contactReceiverGameObjectName);
                         }
-
+                        constraintsGameObjectName = EditorGUILayout.TextField(constraintsGameObjectName);
+                        vrcPositionConstraintName = EditorGUILayout.TextField(vrcPositionConstraintName);
+                        vrcRotationConstraintName = EditorGUILayout.TextField(vrcRotationConstraintName);
+                        vrcParentConstraintName = EditorGUILayout.TextField(vrcParentConstraintName);
+                        vrcScaleConstraintName = EditorGUILayout.TextField(vrcScaleConstraintName);
+                        vrcAimConstraintName = EditorGUILayout.TextField(vrcAimConstraintName);
+                        vrcLookAtConstraintName = EditorGUILayout.TextField(vrcLookAtConstraintName);
                         isDeleteEnabled = EditorGUILayout.Toggle(isDeleteEnabled);
                         _isKeepPbVersion = EditorGUILayout.Toggle(_isKeepPbVersion);
                     }
@@ -137,9 +177,16 @@ namespace dev.kesera2.physbone_extractor
                     if (prefabRoot != null && searchRoot != null)
                     {
                         CreateAvatarDynamics();
-                        copiedPbColliderComponents = CopyComponent<VRCPhysBoneCollider>(_avatarDynamics,
+                        var constraints = new Constraints(vrcPositionConstraintName, vrcRotationConstraintName,
+                            vrcParentConstraintName, vrcScaleConstraintName, vrcAimConstraintName,
+                            vrcLookAtConstraintName);
+                        copiedConstraintComponents = constraints.CopyVRCConstraint(searchRoot, _avatarDynamics, constraintsGameObjectName);
+                        copiedPbColliderComponents = Utility.CopyComponent<VRCPhysBoneCollider>(searchRoot,
+                            _avatarDynamics,
                             pbColliderGameObjectName, CopyVRCPhysboneCollider);
-                        copiedPbComponents = CopyComponent<VRCPhysBone>(_avatarDynamics, pbGameObjectName, CopyVRCPhysBone);
+                        copiedPbComponents =
+                            Utility.CopyComponent<VRCPhysBone>(searchRoot, _avatarDynamics, pbGameObjectName,
+                                CopyVRCPhysBone);
                         var hasContacts = CopyVRCContacts();
                         if (!(copiedPbComponents.Count > 0 || copiedPbColliderComponents.Count > 0 || hasContacts))
                             // Destroy the GameObject of AvatarDynamics if there is no target components.
@@ -171,6 +218,7 @@ namespace dev.kesera2.physbone_extractor
             {
                 return;
             }
+
             // Define the order of the child objects
             string[] order =
             {
@@ -180,10 +228,10 @@ namespace dev.kesera2.physbone_extractor
                 contactSenderGameObjectName,
                 contactReceiverGameObjectName
             };
-        
+
             // Get all child objects of the AvatarDynamics GameObject
             Transform[] children = _avatarDynamics.GetComponentsInChildren<Transform>(true);
-        
+
             // Create a list to store the sorted child objects
             List<Transform> sortedChildren = new List<Transform>();
 
@@ -248,84 +296,19 @@ namespace dev.kesera2.physbone_extractor
             _avatarDynamics.transform.SetParent(prefabRoot.transform);
         }
 
-        private List<T> CopyComponent<T>(GameObject parent, string gameObjectName, System.Action<T, T> copyAction,
-            bool useParentGameObject = false) where T : Component
-        {
-            GameObject componentsParent;
-            
-            // Create a parent GameObject for the copied components
-            if (useParentGameObject)
-            {
-                componentsParent = parent;
-            }
-            else
-            {
-                // Create a new GameObject if the parent GameObject is not used
-                componentsParent = new GameObject(gameObjectName);
-                componentsParent.transform.SetParent(parent.transform);
-            }
-
-            // Get all components of the specified type
-            var components = new List<T>(searchRoot.GetComponentsInChildren<T>());
-            
-            // Create a list to store the copied components
-            var destComponents = new List<T>();
-            
-            foreach (var sourceComponent in components)
-            {
-                var sourceTransform = sourceComponent.transform;
-                // Create new GameObject and copy component
-                var newComponent = new GameObject(sourceTransform.name);
-                newComponent.transform.SetParent(useParentGameObject ? parent.transform : componentsParent.transform);
-
-                // Copy the component using the provided copy action
-                var destComponent = newComponent.AddComponent<T>();
-                copyAction(sourceComponent, destComponent);
-                
-                // Add the copied component to the list
-                destComponents.Add(destComponent);
-                
-                // Set the Root Transform if applicable
-                if (destComponent is VRCPhysBone destPhysBone && sourceComponent is VRCPhysBone sourcePhysBone)
-                {
-                    if (!destPhysBone.rootTransform) destPhysBone.rootTransform = sourcePhysBone.transform;
-                }
-                else if (destComponent is VRCPhysBoneCollider destCollider &&
-                         sourceComponent is VRCPhysBoneCollider sourceCollider)
-                {
-                    if (!destCollider.rootTransform) destCollider.rootTransform = sourceCollider.transform;
-                }
-                else if (destComponent is VRCContactSender destSender &&
-                         sourceComponent is VRCContactSender sourceSender)
-                {
-                    if (!destSender.rootTransform) destSender.rootTransform = sourceSender.transform;
-                }
-                else if (destComponent is VRCContactReceiver destReceiver &&
-                         sourceComponent is VRCContactReceiver sourceReceiver)
-                {
-                    if (!destReceiver.rootTransform) destReceiver.rootTransform = sourceReceiver.transform;
-                }
-            }
-
-            if (components.Count == 0 && !useParentGameObject)
-            {
-                DestroyImmediate(componentsParent);
-            }
-
-            return destComponents;
-        }
 
         private bool CopyVRCContacts()
         {
             var contactsParent = new GameObject(contactsGameObjectName);
             contactsParent.transform.SetParent(_avatarDynamics.transform);
 
-            copiedContactReceiverComponents = CopyComponent<VRCContactReceiver>(contactsParent,
+            copiedContactReceiverComponents = Utility.CopyComponent<VRCContactReceiver>(searchRoot, contactsParent,
                 contactReceiverGameObjectName,
                 CopyVRCContactReceiver, !splitContacts);
-            copiedContactSenderComponents = CopyComponent<VRCContactSender>(contactsParent, contactSenderGameObjectName,
+            copiedContactSenderComponents = Utility.CopyComponent<VRCContactSender>(searchRoot, contactsParent,
+                contactSenderGameObjectName,
                 CopyVRCContactSender, !splitContacts);
-    
+
             if (copiedContactReceiverComponents.Count == 0 && copiedContactSenderComponents.Count == 0)
             {
                 DestroyImmediate(contactsParent);
@@ -478,12 +461,18 @@ namespace dev.kesera2.physbone_extractor
             {
                 var physboneComponents = new List<VRCPhysBone>(searchRoot.GetComponentsInChildren<VRCPhysBone>());
                 physboneComponents.ForEach(DestroyImmediate);
-                var physboneColliderComponents = new List<VRCPhysBoneCollider>(searchRoot.GetComponentsInChildren<VRCPhysBoneCollider>());
+                var physboneColliderComponents =
+                    new List<VRCPhysBoneCollider>(searchRoot.GetComponentsInChildren<VRCPhysBoneCollider>());
                 physboneColliderComponents.ForEach(DestroyImmediate);
-                var contactSenderComponents = new List<VRCContactSender>(searchRoot.GetComponentsInChildren<VRCContactSender>());
+                var contactSenderComponents =
+                    new List<VRCContactSender>(searchRoot.GetComponentsInChildren<VRCContactSender>());
                 contactSenderComponents.ForEach(DestroyImmediate);
-                var contactReceiverComponents = new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
+                var contactReceiverComponents =
+                    new List<VRCContactReceiver>(searchRoot.GetComponentsInChildren<VRCContactReceiver>());
                 contactReceiverComponents.ForEach(DestroyImmediate);
+                var constraintsComponents =
+                    new List<VRCConstraintBase>(searchRoot.GetComponentsInChildren<VRCConstraintBase>());
+                constraintsComponents.ForEach(DestroyImmediate);
             }
         }
 
@@ -581,8 +570,11 @@ namespace dev.kesera2.physbone_extractor
         {
             EditorUtility.DisplayDialog(
                 Localization.S("msg.dialog.title"), // ダイアログのタイトル
-                string.Format(Localization.S("msg.dialog.end"), copiedPbComponents.Count, copiedPbColliderComponents.Count,
-                    copiedContactSenderComponents.Count, copiedContactReceiverComponents.Count), // メッセージ
+                string.Format(Localization.S("msg.dialog.end"), copiedPbComponents.Count,
+                    copiedPbColliderComponents.Count,
+                    copiedContactSenderComponents.Count,
+                    copiedContactReceiverComponents.Count,
+                    copiedConstraintComponents.Count),
                 "OK"
             );
         }
