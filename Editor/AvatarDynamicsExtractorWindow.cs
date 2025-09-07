@@ -46,74 +46,136 @@ namespace dev.kesera2.physbone_extractor
         {
             DrawSelectLanguage();
             DrawLogo();
+            // Prefab Root
             using (new EditorGUILayout.HorizontalScope())
             {
-                using (new GUILayout.VerticalScope())
+                EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
+                DrawAvatarRootField();
+            }
+
+            if (_service.PrefabRoot)
+            {
+                // Search Root
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUILayout.LabelField(Localization.S("label.prefab.root"), Settings.LabelGuiLayoutOptions);
-                    if (_service.PrefabRoot)
+                    EditorGUILayout.LabelField(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
+                    DrawSearchRootField();
+                }
+
+                // Avatar Dynamics GameObject Name
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.avatar_dynamics"), Settings.LabelGuiLayoutOptions);
+                    _service.AvatarDynamicsGameObjectName = EditorGUILayout.TextField(_service.AvatarDynamicsGameObjectName);
+                }
+
+                // PhysBone Category
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField("PhysBone", EditorStyles.boldLabel);
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.pb"), Settings.LabelGuiLayoutOptions);
+                    _service.PbGameObjectName = EditorGUILayout.TextField(_service.PbGameObjectName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.pbc"), Settings.LabelGuiLayoutOptions);
+                    _service.PbColliderGameObjectName = EditorGUILayout.TextField(_service.PbColliderGameObjectName);
+                }
+
+                // Contacts Category
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField("Contacts", EditorStyles.boldLabel);
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.contacts"), Settings.LabelGuiLayoutOptions);
+                    _service.ContactsGameObjectName = EditorGUILayout.TextField(_service.ContactsGameObjectName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("option.separate.contacts"), Settings.LabelGuiLayoutOptions);
+                    _service.SplitContacts = EditorGUILayout.Toggle(_service.SplitContacts);
+                }
+                
+                using (new EditorGUI.DisabledScope(!_service.SplitContacts))
+                {
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        EditorGUILayout.LabelField(Localization.S("label.search.root"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.avatar_dynamics"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.pb"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.pbc"), Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.contacts"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("option.separate.contacts"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.contact_sender"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.contact_receiver"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.constraints"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.position_constraints"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.rotation_constraints"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.parent_constraints"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.scale_constraints"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.aim_constraints"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("label.name.lookat_constraints"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("option.remove.original"),
-                            Settings.LabelGuiLayoutOptions);
-                        EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"),
-                            Settings.LabelGuiLayoutOptions);
+                        EditorGUILayout.LabelField(Localization.S("label.name.contact_sender"), Settings.LabelGuiLayoutOptions);
+                        _service.ContactSenderGameObjectName = EditorGUILayout.TextField(_service.ContactSenderGameObjectName);
+                    }
+                    
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField(Localization.S("label.name.contact_receiver"), Settings.LabelGuiLayoutOptions);
+                        _service.ContactReceiverGameObjectName = EditorGUILayout.TextField(_service.ContactReceiverGameObjectName);
                     }
                 }
 
-                using (new GUILayout.VerticalScope())
+                // Constraints Category
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField("Constraints", EditorStyles.boldLabel);
+                
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    DrawAvatarRootField();
-                    if (_service.PrefabRoot)
-                    {
-                        DrawSearchRootField();
-                        _service.AvatarDynamicsGameObjectName = EditorGUILayout.TextField(_service.AvatarDynamicsGameObjectName);
-                        _service.PbGameObjectName = EditorGUILayout.TextField(_service.PbGameObjectName);
-                        _service.PbColliderGameObjectName = EditorGUILayout.TextField(_service.PbColliderGameObjectName);
-                        _service.ContactsGameObjectName = EditorGUILayout.TextField(_service.ContactsGameObjectName);
-                        _service.SplitContacts = EditorGUILayout.Toggle(_service.SplitContacts);
-                        using (new EditorGUI.DisabledScope(!_service.SplitContacts))
-                        {
-                            _service.ContactSenderGameObjectName = EditorGUILayout.TextField(_service.ContactSenderGameObjectName);
-                            _service.ContactReceiverGameObjectName = EditorGUILayout.TextField(_service.ContactReceiverGameObjectName);
-                        }
+                    EditorGUILayout.LabelField(Localization.S("label.name.constraints"), Settings.LabelGuiLayoutOptions);
+                    _service.ConstraintsGameObjectName = EditorGUILayout.TextField(_service.ConstraintsGameObjectName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.position_constraints"), Settings.LabelGuiLayoutOptions);
+                    _service.VrcPositionConstraintName = EditorGUILayout.TextField(_service.VrcPositionConstraintName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.rotation_constraints"), Settings.LabelGuiLayoutOptions);
+                    _service.VrcRotationConstraintName = EditorGUILayout.TextField(_service.VrcRotationConstraintName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.parent_constraints"), Settings.LabelGuiLayoutOptions);
+                    _service.VrcParentConstraintName = EditorGUILayout.TextField(_service.VrcParentConstraintName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.scale_constraints"), Settings.LabelGuiLayoutOptions);
+                    _service.VrcScaleConstraintName = EditorGUILayout.TextField(_service.VrcScaleConstraintName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.aim_constraints"), Settings.LabelGuiLayoutOptions);
+                    _service.VrcAimConstraintName = EditorGUILayout.TextField(_service.VrcAimConstraintName);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.name.lookat_constraints"), Settings.LabelGuiLayoutOptions);
+                    _service.VrcLookAtConstraintName = EditorGUILayout.TextField(_service.VrcLookAtConstraintName);
+                }
 
-                        _service.ConstraintsGameObjectName = EditorGUILayout.TextField(_service.ConstraintsGameObjectName);
-                        _service.VrcPositionConstraintName = EditorGUILayout.TextField(_service.VrcPositionConstraintName);
-                        _service.VrcRotationConstraintName = EditorGUILayout.TextField(_service.VrcRotationConstraintName);
-                        _service.VrcParentConstraintName = EditorGUILayout.TextField(_service.VrcParentConstraintName);
-                        _service.VrcScaleConstraintName = EditorGUILayout.TextField(_service.VrcScaleConstraintName);
-                        _service.VrcAimConstraintName = EditorGUILayout.TextField(_service.VrcAimConstraintName);
-                        _service.VrcLookAtConstraintName = EditorGUILayout.TextField(_service.VrcLookAtConstraintName);
-                        _service.IsDeleteEnabled = EditorGUILayout.Toggle(_service.IsDeleteEnabled);
-                        _service.IsKeepPbVersion = EditorGUILayout.Toggle(_service.IsKeepPbVersion);
-                    }
+                // Options Category
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField("Options", EditorStyles.boldLabel);
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("option.remove.original"), Settings.LabelGuiLayoutOptions);
+                    _service.IsDeleteEnabled = EditorGUILayout.Toggle(_service.IsDeleteEnabled);
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("option.keep.pb.version"), Settings.LabelGuiLayoutOptions);
+                    _service.IsKeepPbVersion = EditorGUILayout.Toggle(_service.IsKeepPbVersion);
                 }
             }
 
@@ -143,12 +205,8 @@ namespace dev.kesera2.physbone_extractor
         private void DrawSearchRootField()
         {
             _service.UpdateSearchRoot();
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                _service.SearchRoot =
-                    (GameObject)EditorGUILayout.ObjectField(_service.SearchRoot, typeof(GameObject), true);
-            }
+            _service.SearchRoot =
+                (GameObject)EditorGUILayout.ObjectField(_service.SearchRoot, typeof(GameObject), true);
         }
 
         private void DrawAvatarRootField()
