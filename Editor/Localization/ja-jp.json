@@ -1,5 +1,5 @@
 ﻿{
-  "info.description": "アバタールートのGameObjectからPhysBoneとPhysBoneCollider、\nVRC Contact Sender/Receiverを抽出します。\nデフォルトで検索先のGameObjectはアバタールート内のArmatureオブジェクトが指定されます。",
+  "info.description": "アバタールートのGameObjectからPhysBone、PhysBoneCollider、\nVRC Contact Sender/Receiver、(Unity/VRC)Constraintsを抽出します。\nUnity ConstraintはVRCConstraintに変換され削除されます。\nデフォルトで検索先のGameObjectはアバタールート内のArmatureオブジェクトが指定されます。",
   "label.prefab.root" : "アバタールートのGameObject",
   "label.search.root" : "検索先のGameObject",
   "label.name.avatar_dynamics": "AvatarDynamicsの名前",

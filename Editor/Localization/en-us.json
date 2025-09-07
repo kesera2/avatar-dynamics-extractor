@@ -1,5 +1,5 @@
 ﻿{
-  "info.description": "Extract PhysBone, PhysBoneCollider, VRC Contact Sender/Receiver from the GameObject of the avatar root.\nThe default search target GameObject is the Armature object in the avatar root.",
+  "info.description": "Extract PhysBone, PhysBoneCollider, VRC Contact Sender/Receiver, and (Unity or VRC) Constraints from the GameObject of the avatar root.\nUnity Constraints are converted to VRCConstraints and then deleted.\nThe default search target GameObject is the Armature object in the avatar root.",
   "label.prefab.root": "Avatar root GameObject",
   "label.search.root": "Search root GameObject",
   "label.name.avatar_dynamics": "Name of AvatarDynamics",
