@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -177,23 +179,46 @@ namespace dev.kesera2.physbone_extractor
         {
             List<VRCConstraintBase> vrcConstraints = new List<VRCConstraintBase>();
 
+            // VRCConstraintManager の型を取得
+            Type managerType = Type.GetType("VRC.SDK3.Dynamics.Constraint.Components.VRCConstraintManager, VRC.SDK3.Dynamics.Constraint");
+            if (managerType == null)
+            {
+                Debug.LogError("VRCConstraintManager type not found");
+                return vrcConstraints;
+            }
+
+            // TryCreateSubstituteConstraint メソッドを取得
+            MethodInfo tryCreateMethod = managerType.GetMethod(
+                "TryCreateSubstituteConstraint",
+                BindingFlags.Public | BindingFlags.Static
+            );
+
+            if (tryCreateMethod == null)
+            {
+                Debug.LogError("TryCreateSubstituteConstraint method not found");
+                return vrcConstraints;
+            }
+
+            // ジェネリックメソッドを構築
+            MethodInfo genericMethod = tryCreateMethod.MakeGenericMethod(
+                typeof(VRCPositionConstraint),
+                typeof(VRCRotationConstraint),
+                typeof(VRCScaleConstraint),
+                typeof(VRCParentConstraint),
+                typeof(VRCAimConstraint),
+                typeof(VRCLookAtConstraint)
+            );
+
             foreach (IConstraint unityConstraint in unityConstraints)
             {
                 Component unityComponent = unityConstraint as Component;
 
-                bool success = VRCConstraintManager.TryCreateSubstituteConstraint<
-                    VRCPositionConstraint,
-                    VRCRotationConstraint,
-                    VRCScaleConstraint,
-                    VRCParentConstraint,
-                    VRCAimConstraint,
-                    VRCLookAtConstraint
-                >(
-                    unityConstraint,
-                    out VRCConstraintBase substitute,
-                    null, // EditorSubstituteCreator が不要なら null
-                    false // keepBinding: 元の Unity Constraint は不要なら false
-                );
+                // メソッド呼び出しのパラメータ
+                object[] parameters = new object[] { unityConstraint, null, null, false };
+
+                // リフレクション経由でメソッドを呼び出し
+                bool success = (bool)genericMethod.Invoke(null, parameters);
+                VRCConstraintBase substitute = parameters[1] as VRCConstraintBase;
 
                 if (success && substitute != null)
                 {
