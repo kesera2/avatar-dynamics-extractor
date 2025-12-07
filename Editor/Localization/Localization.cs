@@ -51,6 +51,11 @@ namespace dev.kesera2.physbone_extractor
         
         public static string S(string key)
         {
+            if (key == null)
+            {
+                return null;
+            }
+
             if (_translations != null && _translations.TryGetValue(key, out var value))
             {
                 return value;
