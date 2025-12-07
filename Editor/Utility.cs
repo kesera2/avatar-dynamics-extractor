@@ -83,10 +83,6 @@ namespace dev.kesera2.physbone_extractor
         
         public static bool hasParentGameObject(GameObject gameObject)
         {
-            if (gameObject == null)
-            {
-                return false;
-            }
             return gameObject.transform.parent != null;
         }
     }
