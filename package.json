@@ -1,6 +1,6 @@
 {
   "name": "dev.kesera2.avatar-dynamics-extractor",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "displayName": "kesera2's Avatar Dynamics Extractor",
   "description": "Extract Avatar Dynamics components such as Physbone, Physbone Collider, and Contacts, then place them in the avatar root as Avatar Dynamics",
   "author": {
@@ -11,6 +11,8 @@
   "unityRelease": "22f1",
   "license": "zlib",
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "2.0.0"
+    "com.unity.nuget.newtonsoft-json": "2.0.0",
+    "com.vrchat.base": "3.10.0",
+    "com.vrchat.avatars": "3.10.0"
   }
 }
