@@ -15,15 +15,15 @@ namespace dev.kesera2.physbone_extractor
         private static Dictionary<string, string> _translations;
         private static string _selectedLanguage; // デフォルト言語
 
-        internal static ImmutableDictionary<string, string> SupportedLanguageDisplayNames
+        public static ImmutableDictionary<string, string> SupportedLanguageDisplayNames
             = ImmutableDictionary<string, string>.Empty
                 .Add("ja-JP", "日本語")
                 .Add("en-US", "English");
-        
-        internal static ImmutableList<string>
+
+        public static ImmutableList<string>
             SupportedLanguages = new string[] {"ja-JP", "en-US"}.ToImmutableList();
 
-        internal static string[] DisplayNames = SupportedLanguages.Select(l =>
+        public static string[] DisplayNames = SupportedLanguages.Select(l =>
         {
             return SupportedLanguageDisplayNames.TryGetValue(l, out var displayName) ? displayName : l;
         }).ToArray();
